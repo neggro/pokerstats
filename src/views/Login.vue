@@ -1,81 +1,89 @@
 <template>
-    <div class="container">
+<div class="row">
+    <app-loading v-if="isLoading"></app-loading>
+    <form class="col s12" novalidate autocomplete="off" @submit.prevent="login">
         <div class="row">
-            <form class="col s12" novalidate autocomplete="off" @submit.prevent="login">
-                <div class="row">
-                    <div class="input-field col m6 s12">
-                        <input id="email" type="email" class="validate" v-model="user.email">
-                        <label for="email" data-error="Please enter a valid Email">
-                            Email
-                        </label>
-                    </div>
-                    <div class="input-field col m6 s12">
-                        <input id="password" type="password" class="validate" v-model="user.password">
-                        <label for="password">
-                            {{ $t('Password') }}
-                        </label>
-                    </div>
-                    <div class="col s12 action-controls">
-                        <button type="submit" name="button" class="waves-effect waves-light btn">
-                            {{ $t('Login') }}
-                        </button>
-                        <router-link to="/register">
-                            {{ $t('Create User') }}
-                        </router-link>
-                    </div>
-                </div>
-            </form>
+            <div class="input-field col m6 s12">
+                <input id="email" type="email" class="validate" v-model="user.email">
+                <label for="email" data-error="Please enter a valid Email">
+                    Email
+                </label>
+            </div>
+            <div class="input-field col m6 s12">
+                <input id="password" type="password" class="validate" v-model="user.password">
+                <label for="password">
+                    {{ $t('Password') }}
+                </label>
+            </div>
+            <div class="col s12 action-controls">
+                <button type="submit" name="button" class="waves-effect waves-light btn">
+                    {{ $t('Login') }}
+                </button>
+                <router-link to="/register">
+                    {{ $t('Create User') }}
+                </router-link>
+            </div>
         </div>
-    </div>
+    </form>
+</div>
 </template>
 
 <script>
 
-    import firebase from '../firebase';
+import firebase from '../firebase';
+import AppLoading from '../components/layout/AppLoading.vue';
 
-    export default {
-        data() {
-            return {
-                user: {
-                    email: '',
-                    password: ''
-                },
-                updatedFirstTime: false
-            }
-        },
+export default {
 
-        // this is to avoid browser autocomplete
-        updated() {
-            if (!this.updatedFirstTime) {
-                this.user.email = '';
-                this.user.password = '';
-                this.updatedFirstTime = true;
-            }
-        },
+    components: {
+        AppLoading
+    },
 
-        methods: {
+    data() {
+        return {
+            user: {
+                email: '',
+                password: ''
+            },
+            updatedFirstTime: false,
+            isLoading: false
+        }
+    },
 
-            login() {
+    // this is to avoid browser autocomplete
+    updated() {
+        if (!this.updatedFirstTime) {
+            this.user.email = '';
+            this.user.password = '';
+            this.updatedFirstTime = true;
+        }
+    },
 
-                var emailRE = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    methods: {
 
-                if (emailRE.test(this.user.email) && Boolean(this.user.password)) {
+        login() {
 
-                    firebase.auth()
-                        .signInWithEmailAndPassword(this.user.email, this.user.password)
-                        .then(
-                            () => {
-                                this.$router.push('/');
-                            },
-                            (error) => {
-                                // var errorCode = error.code;
-                                alert(error.message);
-                            }
-                        );
-                }
+            var emailRE = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+            if (emailRE.test(this.user.email) && Boolean(this.user.password)) {
+
+                this.isLoading = true;
+
+                firebase.auth()
+                    .signInWithEmailAndPassword(this.user.email, this.user.password)
+                    .then(
+                        () => {
+                            this.$router.push('/');
+                        },
+                        (error) => {
+                            this.isLoading = false;
+                            alert(error.message);
+                        }
+                    );
             }
         }
     }
+}
 
 </script>
 

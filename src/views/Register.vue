@@ -1,51 +1,56 @@
 <template>
-<div class="container">
-    <div class="row">
-        <form class="col s12" novalidate autocomplete="off" @submit.prevent="register">
-            <div class="row">
-                <div class="input-field col m6 s12">
-                    <input id="first_name" type="text" class="validate" v-model="user.firstName">
-                    <label for="first_name">
-                        {{ $t('First Name') }}
-                    </label>
-                </div>
-                <div class="input-field col m6 s12">
-                    <input id="last_name" type="text" class="validate" v-model="user.lastName">
-                    <label for="last_name">
-                        {{ $t('Last Name') }}
-                    </label>
-                </div>
-                <div class="input-field col m6 s12">
-                    <input id="email" type="email" class="validate" v-model="user.email">
-                    <label for="email" data-error="Please enter a valid Email">
-                        Email
-                    </label>
-                </div>
-                <div class="input-field col m6 s12">
-                    <input id="password" type="password" class="validate" v-model="user.password">
-                    <label for="password">
-                        {{ $t('Password') }}
-                    </label>
-                </div>
-                <div class="col s12 action-controls">
-                    <button type="sumbit" name="button" class="waves-effect waves-light btn">
-                        {{ $t('Create User') }}
-                    </button>
-                    <router-link to="/login">
-                        {{ $t('Login') }}
-                    </router-link>
-                </div>
+<div class="row">
+    <app-loading v-if="isLoading"></app-loading>
+    <form class="col s12" novalidate autocomplete="off" @submit.prevent="register">
+        <div class="row">
+            <div class="input-field col m6 s12">
+                <input id="first_name" type="text" class="validate" v-model="user.firstName">
+                <label for="first_name">
+                    {{ $t('First Name') }}
+                </label>
             </div>
-        </form>
-    </div>
+            <div class="input-field col m6 s12">
+                <input id="last_name" type="text" class="validate" v-model="user.lastName">
+                <label for="last_name">
+                    {{ $t('Last Name') }}
+                </label>
+            </div>
+            <div class="input-field col m6 s12">
+                <input id="email" type="email" class="validate" v-model="user.email">
+                <label for="email" data-error="Please enter a valid Email">
+                    Email
+                </label>
+            </div>
+            <div class="input-field col m6 s12">
+                <input id="password" type="password" class="validate" v-model="user.password">
+                <label for="password">
+                    {{ $t('Password') }}
+                </label>
+            </div>
+            <div class="col s12 action-controls">
+                <button type="sumbit" name="button" class="waves-effect waves-light btn">
+                    {{ $t('Create User') }}
+                </button>
+                <router-link to="/login">
+                    {{ $t('Login') }}
+                </router-link>
+            </div>
+        </div>
+    </form>
 </div>
 </template>
 
 <script>
 
 import firebase from '../firebase';
+import AppLoading from '../components/layout/AppLoading.vue';
 
 export default {
+
+    components: {
+        AppLoading
+    },
+
     data() {
         return {
             user: {
@@ -54,7 +59,8 @@ export default {
                 email: '',
                 password: ''
             },
-            updatedFirstTime: false
+            updatedFirstTime: false,
+            isLoading: false
         }
     },
 
@@ -80,6 +86,8 @@ export default {
 
             if (isValid) {
 
+                this.isLoading = true;
+
                 firebase.auth()
                     .createUserWithEmailAndPassword(this.user.email, this.user.password)
                     .then(
@@ -93,12 +101,13 @@ export default {
                                     this.$router.push('/');
                                 },
                                 (error) => {
+                                    this.isLoading = false;
                                     alert(error.message);
                                 }
                             );
                         },
                         (error) => {
-                            // var errorCode = error.code;
+                            this.isLoading = false;
                             alert(error.message);
                         }
                     );
