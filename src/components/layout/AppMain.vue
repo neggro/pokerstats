@@ -8,16 +8,16 @@
 
 <script>
 
-export default {
-}
+export default {}
 
 </script>
 
 <style lang="scss">
 
-.main {
-    color: #efefef;
-    padding-bottom: 70px;
-}
+    .main {
+        color: #efefef;
+        overflow: hidden;
+        padding-bottom: 85px;
+    }
 
 </style>

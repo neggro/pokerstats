@@ -28,7 +28,6 @@ export default {
         changeLanguage() {
 
             Vue.config.lang = Vue.config.lang === 'en' ? 'es' : 'en';
-
             localStorage.setItem('lang', Vue.config.lang);
         }
     }
