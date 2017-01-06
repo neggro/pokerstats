@@ -3,9 +3,10 @@ import VueRouter from 'vue-router';
 import LoginView from '../views/Login.vue';
 import RegisterView from '../views/Register.vue';
 import HomeView from '../views/Home.vue';
+import CreateGroupView from '../views/CreateGroup.vue';
 import firebase from '../firebase';
 
-var beforeEnterLogginRequiredPath = (to, from, next) => {
+let beforeEnterLogginRequiredPath = (to, from, next) => {
 
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
@@ -16,7 +17,7 @@ var beforeEnterLogginRequiredPath = (to, from, next) => {
     });
 };
 
-var beforeEnterNotLogginRequiredPath = (to, from, next) => {
+let beforeEnterNotLogginRequiredPath = (to, from, next) => {
 
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
@@ -31,12 +32,6 @@ Vue.use(VueRouter);
 
 const ROUTES = [
     {
-        name: 'Home',
-        path: '/',
-        component: HomeView,
-        beforeEnter: beforeEnterLogginRequiredPath
-    },
-    {
         name: 'Login',
         path: '/login',
         component: LoginView,
@@ -47,6 +42,18 @@ const ROUTES = [
         path: '/register',
         component: RegisterView,
         beforeEnter: beforeEnterNotLogginRequiredPath
+    },
+    {
+        name: 'Home',
+        path: '/',
+        component: HomeView,
+        beforeEnter: beforeEnterLogginRequiredPath
+    },
+    {
+        name: 'CreateGroup',
+        path: '/create-group',
+        component: CreateGroupView,
+        beforeEnter: beforeEnterLogginRequiredPath
     },
     {
         path: '*',
