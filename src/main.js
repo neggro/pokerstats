@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
+/* eslint-disable no-unused-vars */
 import i18n from './i18n';
 // import firebase from './firebase';
 

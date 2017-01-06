@@ -31,6 +31,7 @@ $input-error-color: #e57373;
 
 html,
 body {
+    font-size: 14px;
     height: 100%;
 }
 
@@ -43,8 +44,13 @@ body {
     position: relative;
 }
 
-input {
+input,
+.chips .input {
     color: #aaa;
+}
+
+h1 {
+    font-size: 2rem;
 }
 
 </style>
