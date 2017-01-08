@@ -1,6 +1,7 @@
 <template>
     <div class="app-home">
         <app-loading v-if="isLoading"></app-loading>
+
         <div class="card grey darken-2" v-for="group in groups">
             <div class="card-content white-text">
                 <span class="card-title">
@@ -19,10 +20,10 @@
                 <router-link to="/create-group" tag="button" class="waves-effect waves-light btn green darken-3">
                     {{ $t('Details') }}
                 </router-link>
-                <router-link to="/create-group" tag="button" class="waves-effect waves-light btn yellow darken-3">
+                <router-link :to="{name: 'EditGroup', params: {groupId: group.id}}" tag="a" class="waves-effect waves-light btn yellow darken-3">
                     {{ $t('Edit') }}
                 </router-link>
-                <button type="button" class="waves-effect waves-light btn red darken-3" @click="deleteGroup(group.id)">
+                <button type="button" class="waves-effect waves-light btn red darken-3" @click="confirmDeleteGroup(group.id)">
                     {{ $t('Delete') }}
                 </button>
             </div>
@@ -47,6 +48,10 @@
         <router-link to="/create-group" tag="button" class="waves-effect waves-light btn right">
             {{ $t('Create New Group') }}
         </router-link>
+
+        <app-modal id="message" title="Delete Group" message="Are you really sure you want to delete this group?"
+            dismissButtonText="Cancel" confirmationButtonText="Delete"
+            @onDismissModal="dismissModal" @onConfirmationModal="deleteGroup"></app-modal>
     </div>
 </template>
 
@@ -54,11 +59,13 @@
 
 import firebase from '../firebase';
 import AppLoading from '../components/layout/AppLoading.vue';
+import AppModal from '../components/helpers/AppModal.vue';
 
 export default {
 
     components: {
-        AppLoading
+        AppLoading,
+        AppModal
     },
 
     data() {
@@ -66,8 +73,17 @@ export default {
         return {
             groups: null,
             userId: firebase.auth().currentUser.uid,
-            isLoading: true
+            isLoading: true,
+            $modal: null,
+            groupToDelete: null
         };
+    },
+
+    mounted() {
+
+        this.$modal = jQuery('#message').modal({
+            dismissible: false
+        });
     },
 
     created() {
@@ -91,11 +107,19 @@ export default {
             );
         },
 
-        deleteGroup(groupId) {
+        confirmDeleteGroup(groupId) {
+
+            this.groupToDelete = groupId;
+            this.$modal.modal('open');
+        },
+
+        deleteGroup() {
+
+            this.dismissModal(true);
 
             this.isLoading = true;
 
-            firebase.database().ref('groups/' + this.userId + '/' + groupId).remove().then(
+            firebase.database().ref('groups/' + this.userId + '/' + this.groupToDelete).remove().then(
                 () => {
                     this.getGroups();
                 },
@@ -104,6 +128,15 @@ export default {
                     this.isLoading = false;
                 }
             );
+
+            this.groupToDelete = null;
+        },
+
+        dismissModal(resetGroupToDelete) {
+            if (!resetGroupToDelete) {
+                this.groupToDelete = null;
+            }
+            this.$modal.modal('close');
         }
     }
 }
