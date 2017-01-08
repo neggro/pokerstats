@@ -61,7 +61,7 @@ export default {}
 <style lang="scss">
 
 .app-loading {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.35);
     bottom: 0;
     left: 0;
     position: fixed;

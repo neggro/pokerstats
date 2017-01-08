@@ -1,6 +1,7 @@
 <template>
     <div>
         <app-loading v-if="isLoading"></app-loading>
+
         <h1>
             {{ $t('Create New Game Group') }}
         </h1>
@@ -26,14 +27,15 @@
                         <button type="submit" name="button" class="waves-effect waves-light btn">
                             {{ $t('Create Group') }}
                         </button>
-                        <router-link to="/">
+                        <router-link to="/" tag="button" class="btn btn-flat">
                             {{ $t('Back') }}
                         </router-link>
                     </div>
                 </div>
             </form>
         </div>
-        <app-modal id="message" title="Error" message="This is the message" @onDismissModal="dismissModal"></app-modal>
+
+        <app-modal id="message" title="" message="" @onDismissModal="dismissModal"></app-modal>
     </div>
 </template>
 
@@ -59,7 +61,7 @@ export default {
                 members: []
             },
             userId: firebase.auth().currentUser.uid,
-            alertMessage: null,
+            $modal: null,
             isLoading: false
         }
     },
@@ -81,7 +83,7 @@ export default {
             this.group.members.splice(index, 1);
         });
 
-        this.alertMessage = jQuery('#message').modal({
+        this.$modal = jQuery('#message').modal({
             dismissible: false
         });
     },
@@ -117,18 +119,22 @@ export default {
 
                 } else {
 
-                    this.alertMessage.find('h4').text('Warning');
-                    this.alertMessage.modal('open');
+                    this.$modal
+                        .find('h4').text('Warning')
+                        .next().text('Warning message.');
+                    this.$modal.modal('open');
                 }
 
             } else {
-                this.alertMessage.find('h4').text('Error');
-                this.alertMessage.modal('open');
+                this.$modal
+                    .find('h4').text('Error')
+                    .next().text('Error message.');
+                this.$modal.modal('open');
             }
         },
 
         dismissModal() {
-            this.alertMessage.modal('close');
+            this.$modal.modal('close');
         }
     }
 }

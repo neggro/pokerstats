@@ -19,7 +19,7 @@
                 <button type="submit" name="button" class="waves-effect waves-light btn">
                     {{ $t('Login') }}
                 </button>
-                <router-link to="/register">
+                <router-link to="/register" tag="button" class="btn btn-flat">
                     {{ $t('Create User') }}
                 </router-link>
             </div>

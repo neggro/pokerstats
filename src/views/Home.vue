@@ -17,13 +17,13 @@
             </div>
             <div class="card-action">
                 <router-link to="/create-group" tag="button" class="waves-effect waves-light btn green darken-3">
-                    {{ $t('See Group Details') }}
+                    {{ $t('Details') }}
                 </router-link>
                 <router-link to="/create-group" tag="button" class="waves-effect waves-light btn yellow darken-3">
-                    {{ $t('Edit Group') }}
+                    {{ $t('Edit') }}
                 </router-link>
                 <button type="button" class="waves-effect waves-light btn red darken-3" @click="deleteGroup(group.id)">
-                    {{ $t('Delete Group') }}
+                    {{ $t('Delete') }}
                 </button>
             </div>
         </div>

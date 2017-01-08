@@ -31,7 +31,7 @@
                 <button type="sumbit" name="button" class="waves-effect waves-light btn">
                     {{ $t('Create User') }}
                 </button>
-                <router-link to="/login">
+                <router-link to="/login" tag="button" class="btn btn-flat">
                     {{ $t('Login') }}
                 </router-link>
             </div>

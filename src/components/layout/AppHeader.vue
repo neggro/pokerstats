@@ -3,7 +3,9 @@
         <nav class="top-nav grey darken-4">
             <div class="row">
                 <div class="nav-wrapper col s12">
-                    <router-link to="/" class="brand-logo">Poker Stats</router-link>
+                    <router-link to="/" class="brand-logo">
+                        <img src="/src/assets/logo.png" alt="Poker Stats">
+                    </router-link>
                     <ul id="nav-mobile" class="right hide-on-med-and-down">
                         <li>
                             <a href="#" @click.prevent="changeLanguage">
@@ -39,6 +41,10 @@ export default {
 
 .top-nav {
     margin-bottom: 30px;
+}
+
+.brand-logo img {
+    vertical-align: middle;
 }
 
 </style>
