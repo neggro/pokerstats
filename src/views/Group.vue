@@ -3,20 +3,20 @@
         <app-loading v-if="isLoading"></app-loading>
 
         <h1>
-            {{ $t('Create New Game Group') }}
+            {{title}}
         </h1>
         <div class="row">
-            <form class="col s12" novalidate autocomplete="off" @submit.prevent="createGroup">
+            <form class="col s12" novalidate autocomplete="off" @submit.prevent="submitGroup">
                 <div class="row">
                     <div class="input-field col s12">
                         <input id="name" type="text" class="validate" v-model="group.name">
-                        <label for="name">
+                        <label for="name" :class="{'active': group.description}">
                             {{ $t('Group Name') }}
                         </label>
                     </div>
                     <div class="input-field col s12">
                         <input id="description" type="text" class="validate" v-model="group.description">
-                        <label for="description">
+                        <label for="description" :class="{'active': group.description}">
                             {{ $t('Description') }}
                         </label>
                     </div>
@@ -25,7 +25,7 @@
                     </div>
                     <div class="col s12 action-controls">
                         <button type="submit" name="button" class="waves-effect waves-light btn">
-                            {{ $t('Create Group') }}
+                            {{submitButton}}
                         </button>
                         <router-link to="/" tag="button" class="btn btn-flat">
                             {{ $t('Back') }}
@@ -35,7 +35,7 @@
             </form>
         </div>
 
-        <app-modal id="message" title="" message="" @onDismissModal="dismissModal"></app-modal>
+        <app-modal id="message" title="" message="" dismissButtonText="OK" @onDismissModal="dismissModal"></app-modal>
     </div>
 </template>
 
@@ -62,21 +62,41 @@ export default {
             },
             userId: firebase.auth().currentUser.uid,
             $modal: null,
-            isLoading: false
+            $chipsControl: null,
+            isLoading: false,
+            groupId: null,
+            title: Vue.t('Create New Game Group'),
+            submitButton: Vue.t('Create Group')
+        }
+    },
+
+    created() {
+
+        this.groupId = this.$route.params.groupId;
+
+        if (this.groupId) {
+
+            this.title = Vue.t('Update Game Group');
+            this.submitButton = Vue.t('Update Group');
+
+            this.getGroupData();
         }
     },
 
     mounted() {
 
-        var $chipsControl = jQuery('.chips-placeholder');
+        this.$chipsControl = jQuery('.chips-placeholder');
 
-        $chipsControl.material_chip({
+        this.$chipsControl.material_chip({
             placeholder: Vue.t('+ member'),
             secondaryPlaceholder: Vue.t('+ member'),
-        })
+        });
 
-        $chipsControl.on('chip.add', (e, chip) => {
-            this.group.members.push(chip.tag);
+        this.$chipsControl.on('chip.add', (e, chip) => {
+            // this is to prevent add duplplicate members on load
+            if (this.group.members.indexOf(chip.tag) === -1) {
+                this.group.members.push(chip.tag);
+            }
         })
         .on('chip.delete', (e, chip) => {
             var index = this.group.members.indexOf(chip.tag);
@@ -90,7 +110,7 @@ export default {
 
     methods: {
 
-        createGroup() {
+        submitGroup() {
 
             var groupKey;
 
@@ -100,7 +120,8 @@ export default {
 
                     this.isLoading = true;
 
-                    groupKey = firebase.database().ref('groups/' + this.userId).push().key;
+                    // update the existing group or create a new one
+                    groupKey = this.groupId || firebase.database().ref('groups/' + this.userId).push().key;
 
                     firebase.database().ref('groups/' + this.userId + '/' + groupKey).update({
                         id: groupKey,
@@ -135,6 +156,33 @@ export default {
 
         dismissModal() {
             this.$modal.modal('close');
+        },
+
+        getGroupData(groupId) {
+
+            this.isLoading = true;
+
+            firebase.database().ref('groups/' + this.userId + '/' + this.groupId).once('value').then(
+                (snapshot) => {
+
+                    this.group = snapshot.val();
+
+                    if (this.group.members.length) {
+
+                        this.group.members.forEach((member) => {
+
+                            this.$chipsControl.addChip({
+                                tag: member
+                            }, this.$chipsControl);
+                        });
+                    }
+
+                    this.isLoading = false;
+                },
+                () => {
+                    this.isLoading = false;
+                }
+            );
         }
     }
 }

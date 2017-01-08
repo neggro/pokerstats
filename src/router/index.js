@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import LoginView from '../views/Login.vue';
 import RegisterView from '../views/Register.vue';
 import HomeView from '../views/Home.vue';
-import CreateGroupView from '../views/CreateGroup.vue';
+import GroupView from '../views/Group.vue';
 import firebase from '../firebase';
 
 let beforeEnterLogginRequiredPath = (to, from, next) => {
@@ -52,7 +52,13 @@ const ROUTES = [
     {
         name: 'CreateGroup',
         path: '/create-group',
-        component: CreateGroupView,
+        component: GroupView,
+        beforeEnter: beforeEnterLogginRequiredPath
+    },
+    {
+        name: 'EditGroup',
+        path: '/edit-group/:groupId',
+        component: GroupView,
         beforeEnter: beforeEnterLogginRequiredPath
     },
     {
