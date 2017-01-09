@@ -3,14 +3,13 @@ import App from './App.vue';
 import router from './router';
 /* eslint-disable no-unused-vars */
 import i18n from './i18n';
-// import firebase from './firebase';
+import jquery from 'jquery';
+import materializejs from 'materializejs';
+/* eslint-enable no-unused-vars */
 
 /* eslint-disable no-new */
 new Vue({
     router: router,
-    // data: {
-    //     firebase: firebase
-    // },
     el: '#app',
     render: h => h(App)
 });
