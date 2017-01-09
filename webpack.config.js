@@ -1,6 +1,10 @@
 var path = require('path');
 var webpack = require('webpack');
 
+var materializeSassPath = path.resolve(__dirname, './node_modules/materialize-css/sass/');
+var jQueryPath = path.resolve(__dirname, './node_modules/jquery/src/jquery');
+var materializeJSPath = path.resolve(__dirname, './node_modules/materialize-css/dist/js/materialize.js');
+
 module.exports = {
     entry: './src/main.js',
     output: {
@@ -18,7 +22,7 @@ module.exports = {
                         // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
                         // the "scss" and "sass" values for the lang attribute to the right configs here.
                         // other preprocessors should work out of the box, no loader config like this nessessary.
-                        'scss': 'vue-style-loader!css-loader!sass-loader?includePaths[]=' + path.resolve(__dirname, './src/scss/'),
+                        'scss': 'vue-style-loader!css-loader!sass-loader?includePaths[]=' + materializeSassPath,
                         'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
                     }
                     // other vue-loader options go here
@@ -40,7 +44,9 @@ module.exports = {
     },
     resolve: {
         alias: {
-            'vue$': 'vue/dist/vue.common.js'
+            'vue$': 'vue/dist/vue.common.js',
+            jquery: jQueryPath,
+            materializejs: materializeJSPath
         }
     },
     devServer: {
