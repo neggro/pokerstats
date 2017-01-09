@@ -57,94 +57,94 @@
 
 <script>
 
-import firebase from '../firebase';
-import Vue from 'vue';
-import AppLoading from '../components/layout/AppLoading.vue';
-import AppModal from '../components/helpers/AppModal.vue';
+    import firebase from '../firebase';
+    import Vue from 'vue';
+    import AppLoading from '../components/layout/AppLoading.vue';
+    import AppModal from '../components/helpers/AppModal.vue';
 
-export default {
+    export default {
 
-    components: {
-        AppLoading,
-        AppModal
-    },
-
-    data() {
-
-        return {
-            groups: null,
-            userId: firebase.auth().currentUser.uid,
-            isLoading: true,
-            $modal: null,
-            groupToDelete: null,
-            modalTitle: Vue.t('Delete Group'),
-            modalMessage: Vue.t('Are you really sure you want to delete this group?'),
-            modalCancelBtn: Vue.t('Cancel'),
-            modalDeleteBtn: Vue.t('Delete')
-        };
-    },
-
-    mounted() {
-
-        this.$modal = jQuery('#message').modal({
-            dismissible: false
-        });
-    },
-
-    created() {
-        this.getGroups();
-    },
-
-    methods: {
-
-        getGroups() {
-
-            firebase.database().ref('groups/' + this.userId).once('value').then(
-                (snapshot) => {
-
-                    this.groups = snapshot.val();
-
-                    this.isLoading = false;
-                },
-                () => {
-                    this.isLoading = false;
-                }
-            );
+        components: {
+            AppLoading,
+            AppModal
         },
 
-        confirmDeleteGroup(groupId) {
+        data() {
 
-            this.groupToDelete = groupId;
-            this.$modal.modal('open');
+            return {
+                groups: null,
+                userId: firebase.auth().currentUser.uid,
+                isLoading: true,
+                $modal: null,
+                groupToDelete: null,
+                modalTitle: Vue.t('Delete Group'),
+                modalMessage: Vue.t('Are you really sure you want to delete this group?'),
+                modalCancelBtn: Vue.t('Cancel'),
+                modalDeleteBtn: Vue.t('Delete')
+            };
         },
 
-        deleteGroup() {
+        mounted() {
 
-            this.dismissModal(true);
-
-            this.isLoading = true;
-
-            firebase.database().ref('groups/' + this.userId + '/' + this.groupToDelete).remove().then(
-                () => {
-                    this.getGroups();
-                },
-                () => {
-                    alert('error, bla, bla, bla...');
-                    this.isLoading = false;
-                }
-            );
-
-            this.groupToDelete = null;
+            this.$modal = jQuery('#message').modal({
+                dismissible: false
+            });
         },
 
-        dismissModal(resetGroupToDelete) {
-            if (!resetGroupToDelete) {
+        created() {
+            this.getGroups();
+        },
+
+        methods: {
+
+            getGroups() {
+
+                firebase.database().ref('groups/' + this.userId).once('value').then(
+                    (snapshot) => {
+
+                        this.groups = snapshot.val();
+
+                        this.isLoading = false;
+                    },
+                    () => {
+                        this.isLoading = false;
+                    }
+                );
+            },
+
+            confirmDeleteGroup(groupId) {
+
+                this.groupToDelete = groupId;
+                this.$modal.modal('open');
+            },
+
+            deleteGroup() {
+
+                this.dismissModal(true);
+
+                this.isLoading = true;
+
+                firebase.database().ref('groups/' + this.userId + '/' + this.groupToDelete).remove().then(
+                    () => {
+                        this.getGroups();
+                    },
+                    () => {
+                        alert('error, bla, bla, bla...');
+                        this.isLoading = false;
+                    }
+                );
+
                 this.groupToDelete = null;
+            },
+
+            dismissModal(resetGroupToDelete) {
+                if (!resetGroupToDelete) {
+                    this.groupToDelete = null;
+                }
+                this.$modal.modal('close');
             }
-            this.$modal.modal('close');
         }
     }
-}
 
 </script>
 
