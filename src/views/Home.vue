@@ -49,8 +49,8 @@
             {{ $t('Create New Group') }}
         </router-link>
 
-        <app-modal id="message" title="Delete Group" message="Are you really sure you want to delete this group?"
-            dismissButtonText="Cancel" confirmationButtonText="Delete"
+        <app-modal id="message" :title="modalTitle" :message="modalMessage"
+            :dismissButtonText="modalCancelBtn" :confirmationButtonText="modalDeleteBtn"
             @onDismissModal="dismissModal" @onConfirmationModal="deleteGroup"></app-modal>
     </div>
 </template>
@@ -58,6 +58,7 @@
 <script>
 
 import firebase from '../firebase';
+import Vue from 'vue';
 import AppLoading from '../components/layout/AppLoading.vue';
 import AppModal from '../components/helpers/AppModal.vue';
 
@@ -75,7 +76,11 @@ export default {
             userId: firebase.auth().currentUser.uid,
             isLoading: true,
             $modal: null,
-            groupToDelete: null
+            groupToDelete: null,
+            modalTitle: Vue.t('Delete Group'),
+            modalMessage: Vue.t('Are you really sure you want to delete this group?'),
+            modalCancelBtn: Vue.t('Cancel'),
+            modalDeleteBtn: Vue.t('Delete')
         };
     },
 

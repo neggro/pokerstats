@@ -24,7 +24,7 @@
 
 <style lang="scss">
 
-    $roboto-font-path: '/src/fonts/roboto/';
+    $roboto-font-path: '/node_modules/materialize-css/fonts/roboto/';
     $error-color: #e57373;
     $input-error-color: #e57373;
     @import "materialize";
@@ -65,9 +65,8 @@
         position: relative;
     }
 
-    input,
     .chips .input {
-        color: #aaa;
+        color: #efefef;
     }
 
     h1 {
