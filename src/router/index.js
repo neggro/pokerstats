@@ -4,27 +4,22 @@ import LoginView from '../views/Login.vue';
 import RegisterView from '../views/Register.vue';
 import HomeView from '../views/Home.vue';
 import GroupView from '../views/Group.vue';
+import DetailsView from '../views/Details.vue';
 import firebase from '../firebase';
 
 let beforeEnterLogginRequiredPath = (to, from, next) => {
 
     firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            next();
-        } else {
-            next('/login');
-        }
+
+        return user ? next() : next('/login');
     });
 };
 
 let beforeEnterNotLogginRequiredPath = (to, from, next) => {
 
     firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            next('/');
-        } else {
-            next();
-        }
+
+        return user ? next('/') : next();
     });
 };
 
@@ -59,6 +54,12 @@ const ROUTES = [
         name: 'EditGroup',
         path: '/edit-group/:groupId',
         component: GroupView,
+        beforeEnter: beforeEnterLogginRequiredPath
+    },
+    {
+        name: 'GroupDetails',
+        path: '/group-details/:groupId',
+        component: DetailsView,
         beforeEnter: beforeEnterLogginRequiredPath
     },
     {
