@@ -8,8 +8,6 @@ var config = {
     messagingSenderId: '434636272352'
 };
 
-console.warn('va a inicializar fire');
-
 firebase.initializeApp(config);
 
 export default firebase;
