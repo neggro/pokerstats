@@ -11,14 +11,14 @@
     "start": "node server"
   },
   "dependencies": {
-    "express": "^4.14.0",
-    "firebase": "^3.6.4",
-    "jquery": "^3.1.1",
-    "materialize-css": "^0.97.8",
-    "serve-favicon": "^2.3.2",
-    "vue": "^2.1.0",
-    "vue-i18n": "^4.10.0",
-    "vue-router": "^2.1.1"
+    "express": "4.14.1",
+    "firebase": "3.6.9",
+    "jquery": "3.1.1",
+    "materialize-css": "0.98.0",
+    "serve-favicon": "2.3.2",
+    "vue": "2.1.10",
+    "vue-i18n": "5.0.1",
+    "vue-router": "2.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
@@ -30,7 +30,7 @@
     "node-sass": "^4.1.1",
     "sass-loader": "^4.1.1",
     "vue-loader": "^10.0.0",
-    "vue-template-compiler": "^2.1.0",
+    "vue-template-compiler": "^2.1.10",
     "webpack": "^2.1.0-beta.25",
     "webpack-dev-server": "^2.1.0-beta.9"
   }
