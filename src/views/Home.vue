@@ -7,8 +7,14 @@
                 <span class="card-title">
                     {{group.name}}
                 </span>
-                <p>
+                <p class="app-home-row">
                     {{group.description}}
+                </p>
+                <p class="app-home-row">
+                    {{ $t('Chips Total Per Game') }}: {{group.chips}}
+                </p>
+                <p class="app-home-row">
+                    {{ $t('Total Games') }}: {{group.games ? group.games.length : 0}}
                 </p>
                 <div class="chips chips-placeholder">
                     <div class="chip" v-for="member in group.members">
@@ -17,7 +23,7 @@
                 </div>
             </div>
             <div class="card-action">
-                <router-link to="/create-group" tag="button" class="waves-effect waves-light btn green darken-3">
+                <router-link :to="{name: 'GroupDetails', params: {groupId: group.id}}" tag="button" class="waves-effect waves-light btn green darken-3">
                     {{ $t('Details') }}
                 </router-link>
                 <router-link :to="{name: 'EditGroup', params: {groupId: group.id}}" tag="a" class="waves-effect waves-light btn yellow darken-3">
@@ -99,7 +105,7 @@
 
             getGroups() {
 
-                firebase.database().ref('groups/' + this.userId).once('value').then(
+                firebase.database().ref(`groups/${this.userId}`).once('value').then(
                     (snapshot) => {
 
                         this.groups = snapshot.val();
@@ -124,7 +130,7 @@
 
                 this.isLoading = true;
 
-                firebase.database().ref('groups/' + this.userId + '/' + this.groupToDelete).remove().then(
+                firebase.database().ref(`groups/${this.userId}/${this.groupToDelete}`).remove().then(
                     () => {
                         this.getGroups();
                     },
@@ -154,6 +160,10 @@
         border-bottom: none;
         line-height: 36px;
         margin: 25px 0 0;
+    }
+
+    .card .card-content .app-home-row {
+        margin: 8px 0;
     }
 
 </style>
