@@ -40,6 +40,11 @@
 
 <style lang="scss">
 
+    .modal {
+        color: #424242;
+        max-width: 480px;
+    }
+
     .modal-footer .btn-flat {
         color: #212121;
     }
