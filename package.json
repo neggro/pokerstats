@@ -6,12 +6,16 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --inline --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "prestart": "npm run build",
+    "start": "node server"
   },
   "dependencies": {
+    "express": "^4.14.0",
     "firebase": "^3.6.4",
     "jquery": "^3.1.1",
     "materialize-css": "^0.97.8",
+    "serve-favicon": "^2.3.2",
     "vue": "^2.1.0",
     "vue-i18n": "^4.10.0",
     "vue-router": "^2.1.1"
