@@ -10,7 +10,7 @@
                 <div class="row">
                     <div class="input-field col s12">
                         <input id="name" type="text" class="validate" v-model="group.name">
-                        <label for="name" :class="{'active': group.description}">
+                        <label for="name" :class="{'active': group.name}">
                             {{ $t('Group Name') }}
                         </label>
                     </div>
@@ -18,6 +18,12 @@
                         <input id="description" type="text" class="validate" v-model="group.description">
                         <label for="description" :class="{'active': group.description}">
                             {{ $t('Description') }}
+                        </label>
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="chips" type="number" class="validate" v-model="group.chips">
+                        <label for="chips" :class="{'active': group.chips}">
+                            {{ $t('Chips Total Per Game') }}
                         </label>
                     </div>
                     <div class="input-field col s12">
@@ -58,7 +64,9 @@
                 group: {
                     name: '',
                     description: '',
-                    members: []
+                    chips: '',
+                    members: [],
+                    games: []
                 },
                 userId: firebase.auth().currentUser.uid,
                 $modal: null,
@@ -99,8 +107,8 @@
                 }
             })
             .on('chip.delete', (e, chip) => {
-                var index = this.group.members.indexOf(chip.tag);
-                this.group.members.splice(index, 1);
+                const INDEX = this.group.members.indexOf(chip.tag);
+                this.group.members.splice(INDEX, 1);
             });
 
             this.$modal = jQuery('#message').modal({
@@ -112,8 +120,6 @@
 
             submitGroup() {
 
-                var groupKey;
-
                 if (this.group.name) {
 
                     if (this.group.members.length > 1) {
@@ -121,13 +127,15 @@
                         this.isLoading = true;
 
                         // update the existing group or create a new one
-                        groupKey = this.groupId || firebase.database().ref('groups/' + this.userId).push().key;
+                        const GROUP_KEY = this.groupId || firebase.database().ref(`groups/${this.userId}`).push().key;
 
-                        firebase.database().ref('groups/' + this.userId + '/' + groupKey).update({
-                            id: groupKey,
+                        firebase.database().ref(`groups/${this.userId}/${GROUP_KEY}`).update({
+                            id: GROUP_KEY,
                             name: this.group.name,
                             description: this.group.description,
-                            members: this.group.members
+                            chips: this.group.chips,
+                            members: this.group.members,
+                            games: this.group.games
                         }).then(
                             () => {
                                 this.$router.push('/');
@@ -162,7 +170,7 @@
 
                 this.isLoading = true;
 
-                firebase.database().ref('groups/' + this.userId + '/' + this.groupId).once('value').then(
+                firebase.database().ref(`groups/${this.userId}/${this.groupId}`).once('value').then(
                     (snapshot) => {
 
                         this.group = snapshot.val();
@@ -177,6 +185,8 @@
                             });
                         }
 
+                        this.group.games = this.group.games || [];
+
                         this.isLoading = false;
                     },
                     () => {
@@ -188,12 +198,3 @@
     }
 
 </script>
-
-<style lang="scss">
-
-    .modal {
-        color: #424242;
-        max-width: 480px;
-    }
-
-</style>
