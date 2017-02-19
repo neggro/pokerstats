@@ -2,6 +2,10 @@
     <div class="app-home">
         <app-loading v-if="isLoading"></app-loading>
 
+        <h1 class="title">
+            {{ $t('Game Groups') }}
+        </h1>
+
         <div class="card grey darken-2" v-for="group in groups">
             <div class="card-content white-text">
                 <span class="card-title">
@@ -18,7 +22,7 @@
                 </p>
                 <div class="chips chips-placeholder">
                     <div class="chip" v-for="member in group.members">
-                        {{member}}
+                        {{member.name}}
                     </div>
                 </div>
             </div>
@@ -155,6 +159,10 @@
 </script>
 
 <style lang="scss">
+
+    .title {
+        margin-top: 0;
+    }
 
     .app-home .chips {
         border-bottom: none;
