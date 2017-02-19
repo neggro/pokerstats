@@ -5,6 +5,7 @@ import RegisterView from '../views/Register.vue';
 import HomeView from '../views/Home.vue';
 import GroupView from '../views/Group.vue';
 import DetailsView from '../views/Details.vue';
+import GameView from '../views/Game.vue';
 import firebase from '../firebase';
 
 let beforeEnterLogginRequiredPath = (to, from, next) => {
@@ -60,6 +61,12 @@ const ROUTES = [
         name: 'GroupDetails',
         path: '/group-details/:groupId',
         component: DetailsView,
+        beforeEnter: beforeEnterLogginRequiredPath
+    },
+    {
+        name: 'CreateGame',
+        path: '/group-details/:groupId/create-game',
+        component: GameView,
         beforeEnter: beforeEnterLogginRequiredPath
     },
     {
