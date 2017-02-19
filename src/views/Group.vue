@@ -2,8 +2,8 @@
     <div>
         <app-loading v-if="isLoading"></app-loading>
 
-        <h1>
-            {{title}}
+        <h1 class="title">
+            {{ $t(title) }}
         </h1>
         <div class="row">
             <form class="col s12" novalidate autocomplete="off" @submit.prevent="submitGroup">
@@ -31,7 +31,7 @@
                     </div>
                     <div class="col s12 action-controls">
                         <button type="submit" name="button" class="waves-effect waves-light btn">
-                            {{submitButton}}
+                            {{ $t(submitButton) }}
                         </button>
                         <router-link to="/" tag="button" class="btn btn-flat">
                             {{ $t('Back') }}
@@ -73,8 +73,8 @@
                 $chipsControl: null,
                 isLoading: false,
                 groupId: null,
-                title: Vue.t('Create New Game Group'),
-                submitButton: Vue.t('Create Group')
+                title: 'Create New Game Group',
+                submitButton: 'Create Group'
             }
         },
 
@@ -84,8 +84,8 @@
 
             if (this.groupId) {
 
-                this.title = Vue.t('Update Game Group');
-                this.submitButton = Vue.t('Update Group');
+                this.title = 'Update Game Group';
+                this.submitButton = 'Update Group';
 
                 this.getGroupData();
             }
@@ -101,13 +101,24 @@
             });
 
             this.$chipsControl.on('chip.add', (e, chip) => {
-                // this is to prevent add duplplicate members on load
-                if (this.group.members.indexOf(chip.tag) === -1) {
-                    this.group.members.push(chip.tag);
+                if (!chip.id) {
+                    chip.id = 'temp_' + Date.now();
+                }
+                // this is to prevent add duplicate members on load
+                const MEMBER_EXIST = this.group.members.find((member) => {
+                    return member.id === chip.id;
+                });
+                if (!MEMBER_EXIST) {
+                    this.group.members.push({
+                        id: chip.id,
+                        tag: chip.tag
+                    });
                 }
             })
             .on('chip.delete', (e, chip) => {
-                const INDEX = this.group.members.indexOf(chip.tag);
+                const INDEX = this.group.members.findIndex((member) => {
+                    return member.id === chip.id;
+                });
                 this.group.members.splice(INDEX, 1);
             });
 
@@ -129,12 +140,14 @@
                         // update the existing group or create a new one
                         const GROUP_KEY = this.groupId || firebase.database().ref(`groups/${this.userId}`).push().key;
 
+                        const MEMBERS = this.updateMembersData(GROUP_KEY);
+
                         firebase.database().ref(`groups/${this.userId}/${GROUP_KEY}`).update({
                             id: GROUP_KEY,
                             name: this.group.name,
                             description: this.group.description,
                             chips: this.group.chips,
-                            members: this.group.members,
+                            members: MEMBERS,
                             games: this.group.games
                         }).then(
                             () => {
@@ -175,14 +188,20 @@
 
                         this.group = snapshot.val();
 
-                        if (this.group.members.length) {
+                        if (this.group.members && this.group.members.length) {
 
                             this.group.members.forEach((member) => {
 
                                 this.$chipsControl.addChip({
-                                    tag: member
+                                    tag: member.name,
+                                    id: member.id
                                 }, this.$chipsControl);
                             });
+
+                        } else {
+                            // if for some reason the group has no members
+                            // firebase will return members as undefined
+                            this.group.members = [];
                         }
 
                         this.group.games = this.group.games || [];
@@ -193,6 +212,29 @@
                         this.isLoading = false;
                     }
                 );
+            },
+
+            // update members data to be saved
+            updateMembersData(groupId) {
+
+                let membersToBeStored = [];
+
+                this.group.members.forEach((member) => {
+
+                    let memberKey = member.id;
+
+                    if (memberKey.indexOf && memberKey.indexOf('temp_') === 0) {
+
+                        memberKey = firebase.database().ref(`groups/${this.userId}/members`).push().key;
+                    }
+
+                    membersToBeStored.push({
+                        id: memberKey,
+                        name: member.tag || member.name
+                    });
+                });
+
+                return membersToBeStored;
             }
         }
     }
