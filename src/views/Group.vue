@@ -179,7 +179,7 @@
                 this.$modal.modal('close');
             },
 
-            getGroupData(groupId) {
+            getGroupData() {
 
                 this.isLoading = true;
 
