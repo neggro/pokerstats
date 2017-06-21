@@ -73,7 +73,7 @@
 <script>
 
     import firebase from '../firebase';
-    import Vue from 'vue';
+    import i18n from '../i18n';
     import AppLoading from '../components/layout/AppLoading.vue';
     import AppModal from '../components/helpers/AppModal.vue';
 
@@ -93,10 +93,10 @@
                 databaseRef: firebase.database(),
                 isLoading: true,
                 $modal: null,
-                modalTitle: Vue.t('Delete Group'),
-                modalMessage: Vue.t('Are you really sure you want to delete this group?'),
-                modalCancelBtn: Vue.t('Cancel'),
-                modalDeleteBtn: Vue.t('Delete')
+                modalTitle: i18n.t('Delete Group'),
+                modalMessage: i18n.t('Are you really sure you want to delete this group?'),
+                modalCancelBtn: i18n.t('Cancel'),
+                modalDeleteBtn: i18n.t('Delete')
             };
         },
 
@@ -172,7 +172,7 @@
                 MONTH_NUMBER = MONTH_NUMBER < 10 ? '0' + MONTH_NUMBER : MONTH_NUMBER;
                 DATE_NUMBER = DATE_NUMBER < 10 ? '0' + DATE_NUMBER : DATE_NUMBER;
 
-                return this.$lang === 'en' ?
+                return i18n.locale.indexOf('en') === 0 ?
                     `${MONTH_NUMBER}/${DATE_NUMBER}/${FULL_YEAR}` :
                     `${DATE_NUMBER}/${MONTH_NUMBER}/${FULL_YEAR}`;
             },

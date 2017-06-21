@@ -10,6 +10,7 @@ import materializejs from 'materializejs';
 /* eslint-disable no-new */
 new Vue({
     router: router,
+    i18n: i18n,
     el: '#app',
     render: h => h(App)
 });

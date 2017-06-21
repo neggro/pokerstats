@@ -56,7 +56,7 @@
         </div>
 
         <router-link to="/create-group" tag="button" class="waves-effect waves-light btn right">
-            {{ $t('Create New Group') }}
+            {{ this.$i18n.t('Create New Group') }}
         </router-link>
 
         <app-modal id="message" :title="modalTitle" :message="modalMessage"
@@ -68,7 +68,7 @@
 <script>
 
     import firebase from '../firebase';
-    import Vue from 'vue';
+    import i18n from '../i18n';
     import AppLoading from '../components/layout/AppLoading.vue';
     import AppModal from '../components/helpers/AppModal.vue';
 
@@ -87,10 +87,10 @@
                 isLoading: true,
                 $modal: null,
                 groupToDelete: null,
-                modalTitle: Vue.t('Delete Group'),
-                modalMessage: Vue.t('Are you really sure you want to delete this group?'),
-                modalCancelBtn: Vue.t('Cancel'),
-                modalDeleteBtn: Vue.t('Delete')
+                modalTitle: i18n.t('Delete Group'),
+                modalMessage: i18n.t('Are you really sure you want to delete this group?'),
+                modalCancelBtn: i18n.t('Cancel'),
+                modalDeleteBtn: i18n.t('Delete')
             };
         },
 

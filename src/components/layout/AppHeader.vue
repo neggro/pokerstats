@@ -21,7 +21,7 @@
 
 <script>
 
-import Vue from 'vue';
+import i18n from '../../i18n';
 
 export default {
 
@@ -29,8 +29,8 @@ export default {
 
         changeLanguage() {
 
-            Vue.config.lang = Vue.config.lang === 'en' ? 'es' : 'en';
-            localStorage.setItem('lang', Vue.config.lang);
+            i18n.locale = i18n.locale === 'en-US' ? 'es-ES' : 'en-US';
+            localStorage.setItem('lang', i18n.locale);
         }
     }
 }

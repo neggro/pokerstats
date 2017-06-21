@@ -53,7 +53,7 @@
 
 <script>
 
-    import Vue from 'vue';
+    import i18n from '../i18n';
     import firebase from '../firebase';
     import AppLoading from '../components/layout/AppLoading.vue';
     import AppModal from '../components/helpers/AppModal.vue';
@@ -128,7 +128,7 @@
                     MONTH_NUMBER = MONTH_NUMBER < 10 ? '0' + MONTH_NUMBER : MONTH_NUMBER;
                     DATE_NUMBER = DATE_NUMBER < 10 ? '0' + DATE_NUMBER : DATE_NUMBER;
 
-                    this.game.date = this.$lang === 'en' ?
+                    this.game.date = i18n.locale.indexOf('en') === 0 ?
                         `${MONTH_NUMBER}/${DATE_NUMBER}/${FULL_YEAR}` :
                         `${DATE_NUMBER}/${MONTH_NUMBER}/${FULL_YEAR}`;
 
@@ -164,8 +164,8 @@
             this.$chipsControl = jQuery('.chips-placeholder');
 
             this.$chipsControl.material_chip({
-                placeholder: Vue.t('+ player'),
-                secondaryPlaceholder: Vue.t('+ player'),
+                placeholder: i18n.t('+ player'),
+                secondaryPlaceholder: i18n.t('+ player'),
             });
 
             this.$chipsControl.on('chip.add', (e, chip) => {

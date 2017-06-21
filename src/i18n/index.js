@@ -5,25 +5,28 @@ import enLanguage from './languages/en.json';
 import esLanguage from './languages/es.json';
 
 let locales = {
-    en: enLanguage,
-    es: esLanguage
+    "en-US": enLanguage,
+    "es-ES": esLanguage,
+    "es-UY": esLanguage
 };
 
 Vue.use(VueI18n);
 
 let userLanguage = localStorage.getItem('lang') || (navigator.languages && navigator.languages[0] ||
-    navigator.language || 'en').split('-')[0];
+    navigator.language || 'en-US');
 
-Vue.config.lang = locales[userLanguage] ? userLanguage : 'en';
+let currentLocale = locales[userLanguage] ? userLanguage : 'en-US';
 
-localStorage.setItem('lang', Vue.config.lang);
-
-Vue.config.missingHandler = (lang, key) => {
-    // handle translation missing
-    return key;
-};
-
-// set locales
-Object.keys(locales).forEach((lang) => {
-    Vue.locale(lang, locales[lang]);
+let i18n = new VueI18n({
+    locale: currentLocale,
+    fallbackLocale: 'en-US',
+    messages: locales,
+    missing: (lang, key) => {
+        // handle translation missing
+        return key;
+    }
 });
+
+localStorage.setItem('lang', currentLocale);
+
+export default i18n;

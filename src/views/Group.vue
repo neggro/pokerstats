@@ -47,7 +47,7 @@
 
 <script>
 
-    import Vue from 'vue';
+    import i18n from '../i18n';
     import firebase from '../firebase';
     import AppLoading from '../components/layout/AppLoading.vue';
     import AppModal from '../components/helpers/AppModal.vue';
@@ -90,7 +90,7 @@
                 this.getGroupData();
             }
 
-            document.title = 'Poker Stats - ' + Vue.t(this.title);
+            document.title = 'Poker Stats - ' + i18n.t(this.title);
         },
 
         mounted() {
@@ -98,8 +98,8 @@
             this.$chipsControl = jQuery('.chips-placeholder');
 
             this.$chipsControl.material_chip({
-                placeholder: Vue.t('+ member'),
-                secondaryPlaceholder: Vue.t('+ member'),
+                placeholder: i18n.t('+ member'),
+                secondaryPlaceholder: i18n.t('+ member'),
             });
 
             this.$chipsControl.on('chip.add', (e, chip) => {
