@@ -59,13 +59,19 @@ const ROUTES = [
     },
     {
         name: 'GroupDetails',
-        path: '/group-details/:groupId',
+        path: '/group/:groupId',
         component: DetailsView,
         beforeEnter: beforeEnterLogginRequiredPath
     },
     {
         name: 'CreateGame',
-        path: '/group-details/:groupId/create-game',
+        path: '/group/:groupId/create-game',
+        component: GameView,
+        beforeEnter: beforeEnterLogginRequiredPath
+    },
+    {
+        name: 'EditGame',
+        path: '/group/:groupId/edit-game/:gameId',
         component: GameView,
         beforeEnter: beforeEnterLogginRequiredPath
     },
