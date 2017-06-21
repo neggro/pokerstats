@@ -64,6 +64,10 @@
             }
         },
 
+        created() {
+            document.title = 'Poker Stats - Register';
+        },
+
         // this is to avoid browser autocomplete
         updated() {
             if (!this.updatedFirstTime) {

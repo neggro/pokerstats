@@ -89,6 +89,8 @@
 
                 this.getGroupData();
             }
+
+            document.title = 'Poker Stats - ' + Vue.t(this.title);
         },
 
         mounted() {
@@ -148,7 +150,8 @@
                             description: this.group.description,
                             chips: this.group.chips,
                             members: MEMBERS,
-                            games: this.group.games
+                            games: this.group.games,
+                            totalGames: this.group.totalGames || 0
                         }).then(
                             () => {
                                 this.$router.push('/');

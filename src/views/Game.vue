@@ -6,10 +6,10 @@
             {{ $t(title) }}
         </h1>
         <div class="row">
-            <form class="col s12" novalidate autocomplete="off" @submit.prevent="submitGroup">
+            <form class="col s12" novalidate autocomplete="off" @submit.prevent="submitGame">
                 <div class="row">
                     <div class="input-field col s12">
-                        <input id="date" type="date" class="validate datepicker" v-model="game.date">
+                        <input id="date" type="date" class="validate datepicker">
                         <label for="date" :class="{'active': game.date}">
                             {{ $t('Date') }}
                         </label>
@@ -22,26 +22,18 @@
                     </div>
                     <div class="input-field col s12">
                         <input id="chipsPerPlayer" type="number" readonly v-model="game.chipsPerPlayer">
-                        <label for="chipsPerPlayer" :class="{'active': game.chipsPerPlayer}">
+                        <label for="chipsPerPlayer" class="active">
                             {{ $t('Chips per Player') }}
                         </label>
                     </div>
                     <div class="input-field col s12">
                         <input id="remainingChips" type="number" readonly v-model="game.remainingChips">
-                        <label for="remainingChips" :class="{'active': game.remainingChips}">
+                        <label for="remainingChips" class="active">
                             {{ $t('Remaining Chips') }}
                         </label>
                     </div>
                     <div class="input-field col s12">
                         <div class="chips chips-placeholder"></div>
-                    </div>
-                    <div class="input-field col s12">
-                        <select id="numberOfWinners" v-model="game.numberOfWinners" class="browser-default">
-                            <option v-for="n in [1, 2, 3, 4]" :value="n">{{n}}</option>
-                        </select>
-                        <label for="numberOfWinners" :class="{'active': game.numberOfWinners}">
-                            {{ $t('Number of Winners') }}
-                        </label>
                     </div>
                     <div class="col s12 action-controls">
                         <button type="submit" name="button" class="waves-effect waves-light btn">
@@ -77,9 +69,11 @@
             return {
                 game: {
                     date: '',
+                    dateStamp: '',
                     chips: '',
-                    numberOfWinners: 2,
-                    players: []
+                    players: [],
+                    chipsPerPlayer: 0,
+                    remainingChips: 0
                 },
                 userId: firebase.auth().currentUser.uid,
                 $modal: null,
@@ -95,6 +89,8 @@
 
         created() {
 
+            document.title = 'Poker Stats - Game';
+
             this.groupId = this.$route.params.groupId;
 
             this.gameId = this.$route.params.gameId;
@@ -103,9 +99,14 @@
 
                 this.title = 'Update Game';
                 this.submitButton = 'Update Game';
-            }
 
-            this.getGroupData();
+                this.getGameData();
+
+            } else {
+
+                // use the group members by default
+                this.getGroupData();
+            }
         },
 
         mounted() {
@@ -140,7 +141,7 @@
                         this.$datePicker.val(this.game.date);
                     }
 
-                    this.$datePicker.data('pickadate').close();
+                    // this.$datePicker.data('pickadate').close();
 
                 } else {
 
@@ -154,7 +155,6 @@
                     this.$datePicker.removeClass('invalid');
                 }
             })
-            // by default, let's assume we are creating a new game in this moment
             .set({
                 select: Date.now()
             });
@@ -182,12 +182,14 @@
                         tag: chip.tag
                     });
                 }
+                this.calculateChips();
             })
             .on('chip.delete', (e, chip) => {
                 const INDEX = this.game.players.findIndex((player) => {
                     return player.id === chip.id;
                 });
                 this.game.players.splice(INDEX, 1);
+                this.calculateChips();
             });
 
             this.$modal = jQuery('#message').modal({
@@ -197,52 +199,89 @@
 
         methods: {
 
-            submitGroup() {
+            submitGame() {
 
-                if (this.group.name) {
+                if (this.game.dateStamp && this.game.chips && this.game.players.length) {
 
-                    if (this.group.members.length > 1) {
+                    this.isLoading = true;
 
-                        this.isLoading = true;
+                    // update the existing group or create a new one
+                    const GAME_KEY = this.gameId || firebase.database().ref(`games/${this.groupId}`).push().key;
 
-                        // update the existing group or create a new one
-                        const GROUP_KEY = this.gameId || firebase.database().ref(`groups/${this.userId}`).push().key;
-
-                        firebase.database().ref(`groups/${this.userId}/${GROUP_KEY}`).update({
-                            id: GROUP_KEY,
-                            name: this.group.name,
-                            description: this.group.description,
-                            chips: this.group.chips,
-                            members: this.group.members,
-                            games: this.group.games
-                        }).then(
-                            () => {
-                                this.$router.push('/');
-                            },
-                            (error) => {
-                                this.isLoading = false;
-                                alert(error.message);
+                    firebase.database().ref(`games/${this.groupId}/${GAME_KEY}`).update({
+                        id: GAME_KEY,
+                        dateStamp: this.game.dateStamp,
+                        chips: this.game.chips,
+                        chipsPerPlayer: this.game.chipsPerPlayer,
+                        remainingChips: this.game.remainingChips,
+                        players: this.game.players
+                    }).then(
+                        () => {
+                            // this is a new game, let's update the totalGames number of the group
+                            if (!this.gameId) {
+                                firebase.database().ref(`groups/${this.userId}/${this.groupId}`).update({
+                                    totalGames: this.groupTotalGames + 1 || 0
+                                });
                             }
-                        );
-
-                    } else {
-
-                        this.$modal
-                            .find('h4').text('Warning')
-                            .next().text('Warning message.');
-                        this.$modal.modal('open');
-                    }
+                            this.goBack();
+                        },
+                        (error) => {
+                            this.isLoading = false;
+                            alert(error.message);
+                        }
+                    );
 
                 } else {
                     this.$modal
                         .find('h4').text('Error')
-                        .next().text('Error message.');
+                        .next().text('Faltan datos muñaño!!!');
                     this.$modal.modal('open');
                 }
             },
 
+            calculateChips() {
+                this.game.chipsPerPlayer = Math.floor(this.game.chips / this.game.players.length);
+                this.game.remainingChips = this.game.chips % this.game.players.length;
+            },
+
             dismissModal() {
                 this.$modal.modal('close');
+            },
+
+            getGameData() {
+
+                this.isLoading = true;
+
+                firebase.database().ref(`games/${this.groupId}/${this.gameId}`).once('value').then(
+                    (snapshot) => {
+
+                        this.game = snapshot.val();
+
+                        this.game.dateStamp = this.game.dateStamp;
+
+                        this.$datePicker.data('pickadate').set({
+                            select: this.game.dateStamp
+                        });
+
+                        this.$datePicker.removeClass('invalid');
+
+                        if (this.game.players && this.game.players.length) {
+
+                            this.game.players.forEach((player) => {
+
+                                this.$chipsControl.addChip({
+                                    tag: player.tag,
+                                    id: player.id
+                                }, this.$chipsControl);
+                            });
+                        }
+
+                        this.isLoading = false;
+                    },
+                    () => {
+                        this.isLoading = false;
+                    }
+                );
             },
 
             getGroupData() {
@@ -256,6 +295,8 @@
 
                         this.game.chips = group.chips;
 
+                        this.groupTotalGames = group.totalGames;
+
                         if (group.members && group.members.length) {
 
                             group.members.forEach((member) => {
@@ -267,18 +308,6 @@
                             });
 
                         }
-                        // else {
-                        //     // if for some reason the group has no members
-                        //     // firebase will return members as undefined
-                        //     this.group.members = [];
-                        // }
-
-                        // this.group.games = this.group.games || [];
-
-                        this.game.chipsPerPlayer = Math.floor(this.game.chips / this.game.players.length);
-                        this.game.remainingChips = this.game.chips % this.game.players.length;
-
-                        // TODO: add best way to distribute the chips
 
                         this.isLoading = false;
                     },
@@ -297,10 +326,10 @@
 
                     let playerKey = player.id;
 
-                    if (playerKey.indexOf && playerKey.indexOf('temp_') === 0) {
-
-                        playerKey = firebase.database().ref(`groups/${this.userId}/players`).push().key;
-                    }
+                    // if (playerKey.indexOf && playerKey.indexOf('temp_') === 0) {
+                    //
+                    //     playerKey = firebase.database().ref(`groups/${this.userId}/players`).push().key;
+                    // }
 
                     playersToBeStored.push({
                         id: playerKey,

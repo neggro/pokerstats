@@ -18,7 +18,7 @@
                     {{ $t('Chips Total Per Game') }}: {{group.chips}}
                 </p>
                 <p class="app-home-row">
-                    {{ $t('Total Games') }}: {{group.games ? group.games.length : 0}}
+                    {{ $t('Total Games') }}: {{group.totalGames}}
                 </p>
                 <div class="chips chips-placeholder">
                     <div class="chip" v-for="member in group.members">
@@ -95,6 +95,8 @@
         },
 
         mounted() {
+
+            document.title = 'Poker Stats - Home';
 
             this.$modal = jQuery('#message').modal({
                 dismissible: false

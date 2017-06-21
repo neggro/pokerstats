@@ -50,6 +50,10 @@
             }
         },
 
+        created() {
+            document.title = 'Poker Stats - Login';
+        },
+
         // this is to avoid browser autocomplete
         updated() {
             if (!this.updatedFirstTime) {

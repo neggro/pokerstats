@@ -9,15 +9,20 @@
             </h1>
 
             <p>
-                {{ $t('Total Games') }}: {{group.games ? group.games.length : 0}}
+                {{ $t('Total Games') }}: {{group.totalGames}}
             </p>
 
             <div class="card grey darken-2" v-for="game in group.games">
                 <div class="card-content white-text">
-
+                    <span class="card-title">
+                        {{formatDate(game.dateStamp)}}
+                    </span>
+                    <p>
+                        {{ $t('Winner') }}:
+                    </p>
                 </div>
                 <div class="card-action">
-                    <router-link :to="{name: 'EditGroup', params: {groupId: group.id}}" tag="a" class="waves-effect waves-light btn yellow darken-3">
+                    <router-link :to="{name: 'EditGame', params: {groupId: group.id, gameId: game.id}}" tag="a" class="waves-effect waves-light btn yellow darken-3">
                         {{ $t('Edit') }}
                     </router-link>
                     <button type="button" class="waves-effect waves-light btn red darken-3" @click="confirmDeleteGroup()">
@@ -34,9 +39,14 @@
                 </div>
             </div>
 
-            <router-link :to="{name: 'CreateGame', params: {groupId: group.id}}" tag="button" class="waves-effect waves-light btn right">
-                {{ $t('Create New Game') }}
-            </router-link>
+            <div class="col s12 action-controls">
+                <router-link :to="{name: 'CreateGame', params: {groupId: group.id}}" tag="button" class="waves-effect waves-light btn">
+                    {{ $t('Create New Game') }}
+                </router-link>
+                <button type="button" class="btn btn-flat" @click="goBack()">
+                    {{ $t('Back') }}
+                </button>
+            </div>
 
         </div>
         <!-- if group was loaded correctly -->
@@ -91,13 +101,13 @@
         },
 
         mounted() {
-
             this.$modal = jQuery('#message').modal({
                 dismissible: false
             });
         },
 
         created() {
+            document.title = 'Poker Stats - Group Details';
             this.groupId = this.$route.params.groupId;
             this.getGroup();
         },
@@ -150,6 +160,25 @@
 
             dismissModal() {
                 this.$modal.modal('close');
+            },
+
+            formatDate(timeStamp) {
+
+                const SELECTED_DATE = new Date(timeStamp);
+                let MONTH_NUMBER = SELECTED_DATE.getMonth() + 1;
+                let DATE_NUMBER = SELECTED_DATE.getDate();
+                const FULL_YEAR = SELECTED_DATE.getFullYear();
+
+                MONTH_NUMBER = MONTH_NUMBER < 10 ? '0' + MONTH_NUMBER : MONTH_NUMBER;
+                DATE_NUMBER = DATE_NUMBER < 10 ? '0' + DATE_NUMBER : DATE_NUMBER;
+
+                return this.$lang === 'en' ?
+                    `${MONTH_NUMBER}/${DATE_NUMBER}/${FULL_YEAR}` :
+                    `${DATE_NUMBER}/${MONTH_NUMBER}/${FULL_YEAR}`;
+            },
+
+            goBack() {
+                this.$router.go(-1);
             }
         }
     }
