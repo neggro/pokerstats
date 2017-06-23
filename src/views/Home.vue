@@ -55,9 +55,11 @@
             </div>
         </div>
 
-        <router-link to="/create-group" tag="button" class="waves-effect waves-light btn right">
-            {{ this.$i18n.t('Create New Group') }}
-        </router-link>
+        <div class="fixed-action-btn">
+            <router-link to="/create-group" tag="button" class="btn-floating btn-large red">
+                <i class="material-icons">add</i>
+            </router-link>
+        </div>
 
         <app-modal id="message" :title="modalTitle" :message="modalMessage"
             :dismissButtonText="modalCancelBtn" :confirmationButtonText="modalDeleteBtn"
