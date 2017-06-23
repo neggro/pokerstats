@@ -18,20 +18,36 @@
                         {{formatDate(game.dateStamp)}}
                     </span>
                     <p>
-                        {{ $t('Winner') }}:
+                        <span class="group-details-label">
+                            {{ $t('Chips') }}:
+                        </span>
+                        {{game.chips}}
+                    </p>
+                    <p>
+                        <span class="group-details-label">
+                            {{ $t('Players') }}:
+                        </span>
+                        <span class="group-details-player" v-for="player in game.players">
+                            {{player.tag}}
+                        </span>
+                    </p>
+                    <p>
+                        <span class="group-details-label">
+                            {{ $t('Winner') }}:
+                        </span>
                     </p>
                 </div>
                 <div class="card-action">
                     <router-link :to="{name: 'EditGame', params: {groupId: group.id, gameId: game.id}}" tag="a" class="waves-effect waves-light btn yellow darken-3">
                         {{ $t('Edit') }}
                     </router-link>
-                    <button type="button" class="waves-effect waves-light btn red darken-3" @click="confirmDeleteGroup()">
+                    <button type="button" class="waves-effect waves-light btn red darken-3" @click="confirmDeleteGame(game.id)">
                         {{ $t('Delete') }}
                     </button>
                 </div>
             </div>
 
-            <div class="card grey darken-2" v-if="!group.games">
+            <div class="card grey darken-2" v-if="!group.games.length">
                 <div class="card-content white-text">
                     <span class="card-title">
                         {{ $t('This group has no associated games') }}
@@ -66,7 +82,7 @@
 
         <app-modal id="message" :title="modalTitle" :message="modalMessage"
             :dismissButtonText="modalCancelBtn" :confirmationButtonText="modalDeleteBtn"
-            @onDismissModal="dismissModal" @onConfirmationModal="deleteGroup"></app-modal>
+            @onDismissModal="dismissModal" @onConfirmationModal="deleteGame"></app-modal>
     </div>
 </template>
 
@@ -93,8 +109,8 @@
                 databaseRef: firebase.database(),
                 isLoading: true,
                 $modal: null,
-                modalTitle: i18n.t('Delete Group'),
-                modalMessage: i18n.t('Are you really sure you want to delete this group?'),
+                modalTitle: i18n.t('Delete Game'),
+                modalMessage: i18n.t('Are you really sure you want to delete this game?'),
                 modalCancelBtn: i18n.t('Cancel'),
                 modalDeleteBtn: i18n.t('Delete')
             };
@@ -107,7 +123,7 @@
         },
 
         created() {
-            document.title = 'Poker Stats - Group Details';
+            document.title = 'Poker Stats - ' + i18n.t('Group Details');
             this.groupId = this.$route.params.groupId;
             this.getGroup();
         },
@@ -121,15 +137,16 @@
 
                         this.group = groupSnapshot.val();
 
-                        this.databaseRef.ref(`games/${this.groupId}`).once('value').then(
-                            (gameSnapshot) => {
-                                this.group.games = gameSnapshot.val();
-                                this.isLoading = false;
-                            },
-                            (error) => {
-                                this.isLoading = false;
-                            }
-                        );
+                        this.group.games = [];
+
+                        this.databaseRef.ref(`games/${this.groupId}`).orderByChild('sortStamp').on('child_added',
+                            (snapshot) => {
+                                this.group.games.push(snapshot.val());
+                            }, (error) => {
+                                console.warn(error);
+                            });
+
+                        this.isLoading = false;
                     },
                     (error) => {
                         this.isLoading = false;
@@ -137,19 +154,28 @@
                 );
             },
 
-            confirmDeleteGroup() {
+            confirmDeleteGame(gameId) {
                 this.$modal.modal('open');
+                this.gameToDelete = gameId;
             },
 
-            deleteGroup() {
+            deleteGame() {
 
                 this.dismissModal();
 
                 this.isLoading = true;
 
-                this.databaseRef.ref(`groups/${this.userId}/${this.groupId}`).remove().then(
+                this.databaseRef.ref(`games/${this.groupId}/${this.gameToDelete}`).remove().then(
                     () => {
-                        this.$router.push('/');
+                        this.databaseRef.ref(`groups/${this.userId}/${this.groupId}`).update({
+                            totalGames: this.group.totalGames - 1
+                        }).then(
+                            this.getGroup,
+                            (error) => {
+                                console.log(error);
+                                this.isLoading = false;
+                            }
+                        );
                     },
                     (error) => {
                         alert('error, bla, bla, bla...');
@@ -195,6 +221,15 @@
 
     .card .card-content .app-home-row {
         margin: 8px 0;
+    }
+
+    .group-details-label {
+        display: inline-block;
+        width: 68px;
+    }
+
+    .group-details-player {
+        margin-right: 8px;
     }
 
 </style>
