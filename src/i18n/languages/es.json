@@ -21,7 +21,9 @@
     "Edit": "Editar",
     "First Name": "Nombre",
     "Game Groups": "Grupos de Juego",
+    "Group Details": "Detalles del Grupo",
     "Group Name": "Nombre del Grupo",
+    "Home": "Inicio",
     "Last Name": "Apellido",
     "Loading Group Information": "Cargando Información del Grupo",
     "Loading Groups Information": "Cargando Información de Grupos",
@@ -34,5 +36,6 @@
     "Total Games": "Total de Juegos",
     "Update Group": "Actualizar Grupo",
     "Update Game Group": "Actualizar Grupo de Juego",
-    "You have not created any game group yet": "No has creado ningún grupo de juego aún"
+    "You have not created any game group yet": "No has creado ningún grupo de juego aún",
+    "Winner": "Ganador"
 }
