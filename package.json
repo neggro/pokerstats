@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "author": "Gustavo Cañete <gustavoca245@gmail.com>",
   "private": true,
+  "engines": {
+    "node": "6.5.0"
+  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
