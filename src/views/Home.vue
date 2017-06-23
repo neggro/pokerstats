@@ -96,7 +96,7 @@
 
         mounted() {
 
-            document.title = 'Poker Stats - Home';
+            document.title = 'Poker Stats - ' + i18n.t('Home');
 
             this.$modal = jQuery('#message').modal({
                 dismissible: false
