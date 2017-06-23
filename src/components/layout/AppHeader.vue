@@ -3,10 +3,10 @@
         <nav class="top-nav grey darken-4">
             <div class="row">
                 <div class="nav-wrapper col s12">
-                    <router-link to="/" class="brand-logo">
+                    <router-link to="/" class="brand-logo center">
                         <img src="/src/assets/logo.png" alt="Poker Stats">
                     </router-link>
-                    <ul id="nav-mobile" class="right hide-on-med-and-down">
+                    <ul id="nav-mobile" class="right">
                         <li>
                             <a href="#" @click.prevent="changeLanguage">
                                 {{ $t('SELECT_LANG') }}
@@ -39,12 +39,18 @@ export default {
 
 <style lang="scss">
 
-.top-nav {
-    margin-bottom: 30px;
-}
+    .top-nav {
+        margin-bottom: 30px;
+    }
 
-.brand-logo img {
-    vertical-align: middle;
-}
+    .brand-logo {
+        max-width: 62%;
+        width: 256px;
+    }
+
+    .brand-logo img {
+        vertical-align: middle;
+        width: 100%;
+    }
 
 </style>
