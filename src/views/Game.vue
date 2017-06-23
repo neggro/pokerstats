@@ -35,6 +35,18 @@
                     <div class="input-field col s12">
                         <div class="chips chips-placeholder"></div>
                     </div>
+                    <div class="input-field col s12 winners-container" v-if="gameId">
+                        <p>
+                            {{ $t('Select Winner(s)') }}:
+                        </p>
+                        <p v-for="(player, index) in game.players">
+                            <input type="checkbox" v-bind:id="player.id" @click="selectWinner($event)">
+                            <label v-bind:for="player.id">{{player.tag}}</label>
+                            <span class="winner-chips">
+                                <input disabled type="number" value="" min="0" v-bind:max="game.chips" v-bind:id="'chips_' + player.id">
+                            </span>
+                        </p>
+                    </div>
                     <div class="col s12 action-controls">
                         <button type="submit" name="button" class="waves-effect waves-light btn">
                             {{ $t(submitButton) }}
@@ -53,8 +65,9 @@
 
 <script>
 
-    import i18n from '../i18n';
     import firebase from '../firebase';
+    import i18n from '../i18n';
+    import utils from '../utils';
     import AppLoading from '../components/layout/AppLoading.vue';
     import AppModal from '../components/helpers/AppModal.vue';
 
@@ -73,7 +86,9 @@
                     chips: '',
                     players: [],
                     chipsPerPlayer: 0,
-                    remainingChips: 0
+                    remainingChips: 0,
+                    numberOfWinners: 0,
+                    winners: []
                 },
                 userId: firebase.auth().currentUser.uid,
                 $modal: null,
@@ -120,17 +135,7 @@
 
                 if (value.select) {
 
-                    const SELECTED_DATE = new Date(value.select);
-                    let MONTH_NUMBER = SELECTED_DATE.getMonth() + 1;
-                    let DATE_NUMBER = SELECTED_DATE.getDate();
-                    const FULL_YEAR = SELECTED_DATE.getFullYear();
-
-                    MONTH_NUMBER = MONTH_NUMBER < 10 ? '0' + MONTH_NUMBER : MONTH_NUMBER;
-                    DATE_NUMBER = DATE_NUMBER < 10 ? '0' + DATE_NUMBER : DATE_NUMBER;
-
-                    this.game.date = i18n.locale.indexOf('en') === 0 ?
-                        `${MONTH_NUMBER}/${DATE_NUMBER}/${FULL_YEAR}` :
-                        `${DATE_NUMBER}/${MONTH_NUMBER}/${FULL_YEAR}`;
+                    this.game.date = utils.formatDate(value.select);
 
                     this.game.dateStamp = value.select;
 
@@ -266,6 +271,8 @@
 
                         this.$datePicker.removeClass('invalid');
 
+                        this.game.numberOfWinners = 0;
+
                         if (this.game.players && this.game.players.length) {
 
                             this.game.players.forEach((player) => {
@@ -341,6 +348,16 @@
                 return playersToBeStored;
             },
 
+            selectWinner(event) {
+                var chipsInput = document.getElementById('chips_' + event.target.id);
+                if (event.target.checked) {
+                    chipsInput.removeAttribute('disabled');
+                } else {
+                    chipsInput.value = '';
+                    chipsInput.setAttribute('disabled', 'disabled');
+                }
+            },
+
             goBack() {
                 this.$router.go(-1);
             }
@@ -362,13 +379,36 @@
         color: #9e9e9e;
     }
 
-    select {
+    .winners-container {
+        margin-bottom: 35px;
+        margin-top: -5px;
 
-        &.browser-default {
-            color: #666;
-            margin-top: 10px;
-            max-width: 100px;
+        label {
+            min-width: 150px
         }
     }
+
+    .winner-chips {
+        display: inline-block;
+        margin-left: 15px;
+        position: relative;
+        top: 0.75rem;
+        width: 80px;
+
+        input {
+            height: 28px;
+            margin-bottom: 0px;
+            text-align: center;
+        }
+    }
+
+    // select {
+    //
+    //     &.browser-default {
+    //         color: #666;
+    //         max-width: 100%;
+    //         width: auto;
+    //     }
+    // }
 
 </style>
