@@ -211,6 +211,7 @@
                     firebase.database().ref(`games/${this.groupId}/${GAME_KEY}`).update({
                         id: GAME_KEY,
                         dateStamp: this.game.dateStamp,
+                        sortStamp: this.game.dateStamp * -1,
                         chips: this.game.chips,
                         chipsPerPlayer: this.game.chipsPerPlayer,
                         remainingChips: this.game.remainingChips,
