@@ -40,6 +40,7 @@
     }
 
     .btn {
+        line-height: 44px;
         height: 44px;
         margin-bottom: 10px;
         width: 100%;
