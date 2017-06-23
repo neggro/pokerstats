@@ -4,6 +4,7 @@
     "Are you really sure you want to delete this group?": "Estás realmente seguro que quieres borrar este grupo?",
     "Back": "Atrás",
     "Cancel": "Cancelar",
+    "Chips": "Fichas",
     "Chips per Player": "Fichas por jugador",
     "Chips Total of This Game": "Total de Fichas de Este Juego",
     "Chips Total Per Game": "Total de Fichas por Juego",
@@ -30,12 +31,15 @@
     "Login": "Ingresar",
     "No Groups": "No hay Grupos",
     "Password": "Contraseña",
+    "Players": "Jugadores",
     "Remaining Chips": "Fichas que sobran",
-    "SELECT_LANG": "English",
+    "SELECT_LANG": "ENG",
+    "Select Winner(s)": "Seleccionar Ganador(es)",
     "This group has no associated games": "Este grupo no tiene juegos asociados",
     "Total Games": "Total de Juegos",
+    "Update Game": "Actualizar Juego",
     "Update Group": "Actualizar Grupo",
     "Update Game Group": "Actualizar Grupo de Juego",
     "You have not created any game group yet": "No has creado ningún grupo de juego aún",
-    "Winner": "Ganador"
+    "Winner(s)": "Ganador(es)"
 }
