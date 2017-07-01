@@ -1,5 +1,5 @@
 <template>
-    <div class="app-home">
+    <div class="app-details">
         <app-loading v-if="isLoading"></app-loading>
 
         <div v-if="group">
@@ -12,29 +12,46 @@
                 {{ $t('Total Games') }}: {{group.totalGames}}
             </p>
 
-            <div class="card grey darken-2" v-for="game in group.games">
+            <div class="card grey darken-2" v-for="game in games">
                 <div class="card-content white-text">
                     <span class="card-title">
-                        {{formatDate(game.dateStamp)}}
+                        {{utils.formatDate(game.dateStamp)}}
                     </span>
-                    <p>
+                    <p class="app-details-row">
                         <span class="group-details-label">
                             {{ $t('Chips') }}:
                         </span>
                         {{game.chips}}
                     </p>
-                    <p>
+                    <p class="app-details-row">
+                        <span class="group-details-label">
+                            {{ $t('Chips per Player') }}:
+                        </span>
+                        {{game.chipsPerPlayer}}
+                    </p>
+                    <p class="app-details-row">
                         <span class="group-details-label">
                             {{ $t('Players') }}:
                         </span>
-                        <span class="group-details-player" v-for="player in game.players">
+                    </p>
+                    <div class="chips chips-placeholder">
+                        <span class="chip" v-for="player in game.players">
                             {{player.tag}}
                         </span>
-                    </p>
-                    <p>
+                    </div>
+                    <div v-if="game.winners && game.winners.length">
                         <span class="group-details-label">
-                            {{ $t('Winner') }}:
+                            {{ $t('Winner(s)') }}:
                         </span>
+                        <p class="app-details-row" v-for="winner in game.winners">
+                            <span class="group-details-label">
+                                {{winner.name}}:
+                            </span>
+                            {{winner.chips}}
+                        </p>
+                    </div>
+                    <p class="app-details-row" v-else>
+                        {{ $t('No winners added yet') }}
                     </p>
                 </div>
                 <div class="card-action">
@@ -47,7 +64,7 @@
                 </div>
             </div>
 
-            <div class="card grey darken-2" v-if="!group.games.length">
+            <div class="card grey darken-2" v-if="!games.length">
                 <div class="card-content white-text">
                     <span class="card-title">
                         {{ $t('This group has no associated games') }}
@@ -90,6 +107,7 @@
 
     import firebase from '../firebase';
     import i18n from '../i18n';
+    import utils from '../utils';
     import AppLoading from '../components/layout/AppLoading.vue';
     import AppModal from '../components/helpers/AppModal.vue';
 
@@ -105,6 +123,7 @@
             return {
                 groupId: null,
                 group: null,
+                games: [],
                 userId: firebase.auth().currentUser.uid,
                 databaseRef: firebase.database(),
                 isLoading: true,
@@ -112,7 +131,8 @@
                 modalTitle: i18n.t('Delete Game'),
                 modalMessage: i18n.t('Are you really sure you want to delete this game?'),
                 modalCancelBtn: i18n.t('Cancel'),
-                modalDeleteBtn: i18n.t('Delete')
+                modalDeleteBtn: i18n.t('Delete'),
+                utils: utils
             };
         },
 
@@ -132,24 +152,42 @@
 
             getGroup() {
 
-                this.databaseRef.ref(`groups/${this.userId}/${this.groupId}`).once('value').then(
-                    (groupSnapshot) => {
+                let groupPromise = new Promise((resolve, reject) => {
+                    this.databaseRef.ref(`groups/${this.userId}/${this.groupId}`).once('value').then(
+                        (groupSnapshot) => {
+                            this.group = groupSnapshot.val();
+                            resolve(this.group.totalGames);
+                        },
+                        (error) => {
+                            reject(error);
+                        }
+                    );
+                });
 
-                        this.group = groupSnapshot.val();
+                let gamePromise = new Promise((resolve, reject) => {
+                    this.databaseRef.ref(`games/${this.groupId}`).orderByChild('sortStamp').on('child_added',
+                        (snapshot) => {
+                            this.games.push(snapshot.val());
+                            resolve();
+                        }, (error) => {
+                            reject(error);
+                        }
+                    );
+                    // this is used when the group has no games, in that case,
+                    // the child_added event is never triggered
+                    groupPromise.then((totalGames) => {
+                        if (!totalGames) {
+                            this.games = [];
+                            resolve();
+                        }
+                    });
+                });
 
-                        this.group.games = [];
-
-                        this.databaseRef.ref(`games/${this.groupId}`).orderByChild('sortStamp').on('child_added',
-                            (snapshot) => {
-                                this.group.games.push(snapshot.val());
-                            }, (error) => {
-                                console.warn(error);
-                            });
-
-                        this.isLoading = false;
-                    },
+                Promise.all([groupPromise, gamePromise]).then(
+                    () => this.isLoading = false,
                     (error) => {
                         this.isLoading = false;
+                        console.warn(error);
                     }
                 );
             },
@@ -188,21 +226,6 @@
                 this.$modal.modal('close');
             },
 
-            formatDate(timeStamp) {
-
-                const SELECTED_DATE = new Date(timeStamp);
-                let MONTH_NUMBER = SELECTED_DATE.getMonth() + 1;
-                let DATE_NUMBER = SELECTED_DATE.getDate();
-                const FULL_YEAR = SELECTED_DATE.getFullYear();
-
-                MONTH_NUMBER = MONTH_NUMBER < 10 ? '0' + MONTH_NUMBER : MONTH_NUMBER;
-                DATE_NUMBER = DATE_NUMBER < 10 ? '0' + DATE_NUMBER : DATE_NUMBER;
-
-                return i18n.locale.indexOf('en') === 0 ?
-                    `${MONTH_NUMBER}/${DATE_NUMBER}/${FULL_YEAR}` :
-                    `${DATE_NUMBER}/${MONTH_NUMBER}/${FULL_YEAR}`;
-            },
-
             goBack() {
                 this.$router.go(-1);
             }
@@ -213,23 +236,19 @@
 
 <style lang="scss">
 
-    .app-home .chips {
+    .app-details .chips {
         border-bottom: none;
         line-height: 36px;
-        margin: 25px 0 0;
+        margin: 5px 0;
     }
 
-    .card .card-content .app-home-row {
+    .card .card-content .app-details-row {
         margin: 8px 0;
     }
 
     .group-details-label {
         display: inline-block;
-        width: 68px;
-    }
-
-    .group-details-player {
-        margin-right: 8px;
+        min-width: 125px;
     }
 
 </style>
