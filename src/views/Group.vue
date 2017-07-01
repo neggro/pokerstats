@@ -107,9 +107,7 @@
                     chip.id = 'temp_' + Date.now();
                 }
                 // this is to prevent add duplicate members on load
-                const MEMBER_EXIST = this.group.members.find((member) => {
-                    return member.id === chip.id;
-                });
+                const MEMBER_EXIST = this.group.members.find(member => member.id === chip.id);
                 if (!MEMBER_EXIST) {
                     this.group.members.push({
                         id: chip.id,
@@ -118,9 +116,7 @@
                 }
             })
             .on('chip.delete', (e, chip) => {
-                const INDEX = this.group.members.findIndex((member) => {
-                    return member.id === chip.id;
-                });
+                const INDEX = this.group.members.findIndex(member => member.id === chip.id);
                 this.group.members.splice(INDEX, 1);
             });
 
