@@ -40,10 +40,10 @@
                             {{ $t('Select Winner(s)') }}:
                         </p>
                         <p v-for="(player, index) in game.players">
-                            <input type="checkbox" v-bind:id="player.id" @click="selectWinner($event)">
+                            <input type="checkbox" v-bind:checked="player.isWinner" v-bind:id="player.id" @click="selectWinner($event)">
                             <label v-bind:for="player.id">{{player.tag}}</label>
                             <span class="winner-chips">
-                                <input disabled type="number" value="" min="0" v-bind:max="game.chips" v-bind:id="'chips_' + player.id">
+                                <input v-bind:disabled="!player.isWinner" type="number" v-bind:value="player.chips" min="0" v-bind:max="game.chips" v-bind:id="'chips_' + player.id" @blur="addWinner($event)">
                             </span>
                         </p>
                     </div>
@@ -87,7 +87,6 @@
                     players: [],
                     chipsPerPlayer: 0,
                     remainingChips: 0,
-                    numberOfWinners: 0,
                     winners: []
                 },
                 userId: firebase.auth().currentUser.uid,
@@ -178,9 +177,7 @@
                     chip.id = 'temp_' + Date.now();
                 }
                 // this is to prevent add duplicate players on load
-                const MEMBER_EXIST = this.game.players.find((player) => {
-                    return player.id === chip.id;
-                });
+                const MEMBER_EXIST = this.game.players.find(player => player.id === chip.id);
                 if (!MEMBER_EXIST) {
                     this.game.players.push({
                         id: chip.id,
@@ -190,9 +187,7 @@
                 this.calculateChips();
             })
             .on('chip.delete', (e, chip) => {
-                const INDEX = this.game.players.findIndex((player) => {
-                    return player.id === chip.id;
-                });
+                const INDEX = this.game.players.findIndex(player => player.id === chip.id);
                 this.game.players.splice(INDEX, 1);
                 this.calculateChips();
             });
@@ -220,7 +215,8 @@
                         chips: this.game.chips,
                         chipsPerPlayer: this.game.chipsPerPlayer,
                         remainingChips: this.game.remainingChips,
-                        players: this.game.players
+                        players: this.game.players,
+                        winners: this.game.winners
                     }).then(
                         () => {
                             // this is a new game, let's update the totalGames number of the group
@@ -265,17 +261,25 @@
 
                         this.game.dateStamp = this.game.dateStamp;
 
+                        this.game.winners = this.game.winners || [];
+
                         this.$datePicker.data('pickadate').set({
                             select: this.game.dateStamp
                         });
 
                         this.$datePicker.removeClass('invalid');
 
-                        this.game.numberOfWinners = 0;
-
                         if (this.game.players && this.game.players.length) {
 
                             this.game.players.forEach((player) => {
+
+                                const WINNER_DATA = this.game.winners.find(winner => winner.id === player.id);
+
+                                if (WINNER_DATA) {
+
+                                    player.isWinner = true;
+                                    player.chips = WINNER_DATA.chips;
+                                }
 
                                 this.$chipsControl.addChip({
                                     tag: player.tag,
@@ -325,36 +329,88 @@
                 );
             },
 
+            /*
             // update members data to be saved
-            updateMembersData(groupId) {
+            // updateMembersData(groupId) {
+            //
+            //     let playersToBeStored = [];
+            //
+            //     this.game.players.forEach((player) => {
+            //
+            //         let playerKey = player.id;
+            //
+            //         // if (playerKey.indexOf && playerKey.indexOf('temp_') === 0) {
+            //         //
+            //         //     playerKey = firebase.database().ref(`groups/${this.userId}/players`).push().key;
+            //         // }
+            //
+            //         playersToBeStored.push({
+            //             id: playerKey,
+            //             name: player.tag || player.name
+            //         });
+            //     });
+            //
+            //     return playersToBeStored;
+            // },
+            */
 
-                let playersToBeStored = [];
+            addWinner(event) {
 
-                this.game.players.forEach((player) => {
+                let target = event.target;
+                const PLAYER_ID = target.id.replace('chips_', '');
+                const CHIPS_WON = Number(target.value);
 
-                    let playerKey = player.id;
+                if (!isNaN(CHIPS_WON) && CHIPS_WON) {
 
-                    // if (playerKey.indexOf && playerKey.indexOf('temp_') === 0) {
-                    //
-                    //     playerKey = firebase.database().ref(`groups/${this.userId}/players`).push().key;
-                    // }
+                    this.chipsRemainingForWinners = typeof this.chipsRemainingForWinners === 'number' ?
+                        this.chipsRemainingForWinners :
+                        this.game.chips;
 
-                    playersToBeStored.push({
-                        id: playerKey,
-                        name: player.tag || player.name
-                    });
-                });
+                    if (CHIPS_WON > this.chipsRemainingForWinners) {
 
-                return playersToBeStored;
+                        alert('No viejo, como va a ganar más fichas de las que estaban en juego!!!');
+                        target.value = 0;
+
+                    } else {
+
+                        const WINNER_EXIST = this.game.winners.find(player => player.id === PLAYER_ID);
+
+                        if (!WINNER_EXIST) {
+
+                            const PLAYER = this.game.players.find(player => player.id === PLAYER_ID);
+
+                            this.game.winners.push({
+                                id: PLAYER_ID,
+                                chips: CHIPS_WON,
+                                name: PLAYER.tag
+                            });
+
+                        } else {
+                            WINNER_EXIST.chips = CHIPS_WON;
+                        }
+
+                        this.chipsRemainingForWinners = this.chipsRemainingForWinners - CHIPS_WON;
+                    }
+
+                } else {
+
+                    alert('Las fichas no son validas!!!');
+                }
             },
 
             selectWinner(event) {
-                var chipsInput = document.getElementById('chips_' + event.target.id);
+                const PLAYER_ID = event.target.id;
+                let chipsInput = document.getElementById('chips_' + PLAYER_ID);
                 if (event.target.checked) {
                     chipsInput.removeAttribute('disabled');
                 } else {
                     chipsInput.value = '';
                     chipsInput.setAttribute('disabled', 'disabled');
+                    const INDEX = this.game.winners.findIndex(winner => winner.id === PLAYER_ID);
+                    this.game.winners.splice(INDEX, 1);
+                    let player = this.game.players.find(player => player.id === PLAYER_ID);
+                    delete player.chips;
+                    delete player.isWinner;
                 }
             },
 
@@ -401,14 +457,5 @@
             text-align: center;
         }
     }
-
-    // select {
-    //
-    //     &.browser-default {
-    //         color: #666;
-    //         max-width: 100%;
-    //         width: auto;
-    //     }
-    // }
 
 </style>
