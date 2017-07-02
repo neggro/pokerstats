@@ -12,6 +12,7 @@
                 {{ $t('Total Games') }}: {{group.totalGames}}
             </p>
 
+            <!-- game details -->
             <div class="card grey darken-2" v-for="game in games">
                 <div class="card-content white-text">
                     <span class="card-title">
@@ -21,13 +22,17 @@
                         <span class="group-details-label">
                             {{ $t('Chips') }}:
                         </span>
-                        {{game.chips}}
+                        <span class="group-details-value">
+                            {{game.chips}}
+                        </span>
                     </p>
                     <p class="app-details-row">
                         <span class="group-details-label">
                             {{ $t('Chips per Player') }}:
                         </span>
-                        {{game.chipsPerPlayer}}
+                        <span class="group-details-value">
+                            {{game.chipsPerPlayer}}
+                        </span>
                     </p>
                     <p class="app-details-row">
                         <span class="group-details-label">
@@ -47,22 +52,28 @@
                             <span class="group-details-label">
                                 {{winner.name}}:
                             </span>
-                            {{winner.chips}}
+                            <span class="group-details-value">
+                                {{winner.chips}}
+                            </span>
                         </p>
                     </div>
                     <p class="app-details-row" v-else>
                         {{ $t('No winners added yet') }}
                     </p>
                 </div>
-                <div class="card-action">
+                <div class="card-action" v-if="!game.isClosed">
                     <router-link :to="{name: 'EditGame', params: {groupId: group.id, gameId: game.id}}" tag="a" class="waves-effect waves-light btn yellow darken-3">
                         {{ $t('Edit') }}
                     </router-link>
                     <button type="button" class="waves-effect waves-light btn red darken-3" @click="confirmDeleteGame(game.id)">
                         {{ $t('Delete') }}
                     </button>
+                    <button v-if="game.winners && game.winners.length" type="button" class="waves-effect waves-light btn green darken-3" @click="closeGame(game)">
+                        {{ $t('Close Game') }}
+                    </button>
                 </div>
             </div>
+            <!-- end game details -->
 
             <div class="card grey darken-2" v-if="!games.length">
                 <div class="card-content white-text">
@@ -165,9 +176,22 @@
                 });
 
                 let gamePromise = new Promise((resolve, reject) => {
+                    this.games = [];
                     this.databaseRef.ref(`games/${this.groupId}`).orderByChild('sortStamp').on('child_added',
                         (snapshot) => {
-                            this.games.push(snapshot.val());
+                            let gameSnapshot = snapshot.val();
+                            //if there are more than one winner, let's sort the array from more to less chips
+                            if (gameSnapshot.winners && gameSnapshot.winners.length > 1) {
+                                gameSnapshot.winners = gameSnapshot.winners.sort((a, b) => {
+                                    if (a.chips > b.chips) {
+                                        return -1;
+                                    } else if (b.chips > a.chips) {
+                                        return 1;
+                                    }
+                                    return 0;
+                                });
+                            }
+                            this.games.push(gameSnapshot);
                             resolve();
                         }, (error) => {
                             reject(error);
@@ -188,6 +212,58 @@
                     (error) => {
                         this.isLoading = false;
                         console.warn(error);
+                    }
+                );
+            },
+
+            closeGame(selectedGame) {
+
+                this.isLoading = true;
+
+                firebase.database().ref(`games/${this.groupId}/${selectedGame.id}`).update({
+                    isClosed: true
+                }).then(
+                    () => {
+                        // in case there are winners with same amount of chips
+                        let chipsFirstWinner;
+
+                        selectedGame.winners.forEach((winner, index) => {
+
+                            let currentMember = this.group.members.find((member) => member.id === winner.id);
+
+                            if (index === 0 || chipsFirstWinner === winner.chips) {
+                                chipsFirstWinner = winner.chips;
+                                currentMember.gamesWon++;
+                            }
+
+                            currentMember.chips += winner.chips;
+                        });
+
+                        this.group.members.forEach((member) => {
+                            const MEMBER_PLAYED_THIS_GAME = selectedGame.players
+                                .find((player) => player.id === member.id);
+                            if (MEMBER_PLAYED_THIS_GAME) {
+                                member.chips -= selectedGame.chipsPerPlayer;
+                                member.playedGames++;
+                            }
+                        });
+
+                        firebase.database().ref(`groups/${this.userId}/${this.groupId}`).update({
+                            members: this.group.members
+                        }).then(
+                            () => {
+                                selectedGame.isClosed = true;
+                                this.isLoading = false;
+                            },
+                            (error) => {
+                                this.isLoading = false;
+                                alert(error.message);
+                            }
+                        );
+                    },
+                    (error) => {
+                        this.isLoading = false;
+                        alert(error.message);
                     }
                 );
             },
@@ -249,6 +325,12 @@
     .group-details-label {
         display: inline-block;
         min-width: 125px;
+    }
+
+    .group-details-value {
+        display: inline-block;
+        min-width: 45px;
+        text-align: right;
     }
 
 </style>
