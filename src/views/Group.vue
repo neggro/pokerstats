@@ -229,7 +229,10 @@
 
                     membersToBeStored.push({
                         id: memberKey,
-                        name: member.tag || member.name
+                        name: member.tag || member.name,
+                        chips: member.chips || 0,
+                        gamesWon: member.gamesWon || 0,
+                        playedGames: member.playedGames || 0
                     });
                 });
 
