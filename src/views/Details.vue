@@ -231,12 +231,16 @@
 
                             let currentMember = this.group.members.find((member) => member.id === winner.id);
 
-                            if (index === 0 || chipsFirstWinner === winner.chips) {
-                                chipsFirstWinner = winner.chips;
-                                currentMember.gamesWon++;
-                            }
+                            // an extra player, not member of the group could played the game
+                            if (currentMember) {
 
-                            currentMember.chips += winner.chips;
+                                if (index === 0 || chipsFirstWinner === winner.chips) {
+                                    chipsFirstWinner = winner.chips;
+                                    currentMember.gamesWon++;
+                                }
+
+                                currentMember.chips += winner.chips;
+                            }
                         });
 
                         this.group.members.forEach((member) => {
