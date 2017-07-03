@@ -15,7 +15,7 @@
                         </label>
                     </div>
                     <div class="input-field col s12">
-                        <input id="chips" type="number" class="validate" v-model="game.chips">
+                        <input id="chips" type="number" class="validate" v-model="game.chips" @blur="calculateChips">
                         <label for="chips" :class="{'active': game.chips}">
                             {{ $t('Chips Total of This Game') }}
                         </label>
@@ -83,7 +83,7 @@
                 game: {
                     date: '',
                     dateStamp: '',
-                    chips: '',
+                    chips: 0,
                     players: [],
                     chipsPerPlayer: 0,
                     remainingChips: 0,
@@ -328,31 +328,6 @@
                     }
                 );
             },
-
-            /*
-            // update members data to be saved
-            // updateMembersData(groupId) {
-            //
-            //     let playersToBeStored = [];
-            //
-            //     this.game.players.forEach((player) => {
-            //
-            //         let playerKey = player.id;
-            //
-            //         // if (playerKey.indexOf && playerKey.indexOf('temp_') === 0) {
-            //         //
-            //         //     playerKey = firebase.database().ref(`groups/${this.userId}/players`).push().key;
-            //         // }
-            //
-            //         playersToBeStored.push({
-            //             id: playerKey,
-            //             name: player.tag || player.name
-            //         });
-            //     });
-            //
-            //     return playersToBeStored;
-            // },
-            */
 
             addWinner(event) {
 
