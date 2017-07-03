@@ -20,20 +20,34 @@
                 <p class="app-home-row">
                     {{ $t('Total Games') }}: {{group.totalGames}}
                 </p>
-                <div class="chips chips-placeholder">
-                    <div class="chip" v-for="member in group.members">
-                        {{member.name}}
-                    </div>
-                </div>
+                <table class="striped responsive-table">
+                    <thead>
+                        <tr>
+                            <th>{{ $t('Player') }}</th>
+                            <th class="center-align">{{ $t('Chips') }}</th>
+                            <th class="center-align">{{ $t('Played') }}</th>
+                            <th class="center-align">{{ $t('Won') }}</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="member in group.members">
+                            <td>{{member.name}}</td>
+                            <td class="center-align">{{member.chips}}</td>
+                            <td class="center-align">{{member.playedGames}}</td>
+                            <td class="center-align">{{member.gamesWon}}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="card-action">
-                <router-link :to="{name: 'GroupDetails', params: {groupId: group.id}}" tag="button" class="waves-effect waves-light btn green darken-3">
-                    {{ $t('Details') }}
+                <router-link :to="{name: 'GroupDetails', params: {groupId: group.id}}" tag="button" class="btn btn-flat teal-text text-lighten-2">
+                    {{ $t('Games') }}
                 </router-link>
-                <router-link :to="{name: 'EditGroup', params: {groupId: group.id}}" tag="a" class="waves-effect waves-light btn yellow darken-3">
+                <router-link :to="{name: 'EditGroup', params: {groupId: group.id}}" tag="a" class="btn btn-flat teal-text text-lighten-2">
                     {{ $t('Edit') }}
                 </router-link>
-                <button type="button" class="waves-effect waves-light btn red darken-3" @click="confirmDeleteGroup(group.id)">
+                <button type="button" class="btn btn-flat teal-text text-lighten-2" @click="confirmDeleteGroup(group.id)">
                     {{ $t('Delete') }}
                 </button>
             </div>
@@ -56,7 +70,7 @@
         </div>
 
         <div class="fixed-action-btn">
-            <router-link to="/create-group" tag="button" class="btn-floating btn-large red">
+            <router-link to="/create-group" tag="button" class="btn-floating btn-large">
                 <i class="material-icons">add</i>
             </router-link>
         </div>
@@ -116,7 +130,27 @@
                 firebase.database().ref(`groups/${this.userId}`).once('value').then(
                     (snapshot) => {
 
-                        this.groups = snapshot.val();
+                        let groups = snapshot.val();
+
+                        for (let groupId in groups) {
+
+                            let currentGroup = groups[groupId];
+
+                            // if there are games and more than one member,
+                            // let's sort the array from more to less chips
+                            if (currentGroup.totalGames && currentGroup.members && currentGroup.members.length > 1) {
+                                currentGroup.members = currentGroup.members.sort((a, b) => {
+                                    if (a.chips > b.chips) {
+                                        return -1;
+                                    } else if (b.chips > a.chips) {
+                                        return 1;
+                                    }
+                                    return 0;
+                                });
+                            }
+                        }
+
+                        this.groups = groups;
 
                         this.isLoading = false;
                     },
@@ -168,14 +202,18 @@
         margin-top: 0;
     }
 
-    .app-home .chips {
-        border-bottom: none;
-        line-height: 36px;
-        margin: 25px 0 0;
-    }
+    // .app-home .chips {
+    //     border-bottom: none;
+    //     line-height: 36px;
+    //     margin: 25px 0 0;
+    // }
 
     .card .card-content .app-home-row {
         margin: 8px 0;
+    }
+
+    table.striped > tbody > tr:nth-child(odd) {
+        background-color: #6e6e6e;
     }
 
 </style>
