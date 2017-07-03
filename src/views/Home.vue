@@ -213,7 +213,7 @@
     }
 
     table.striped > tbody > tr:nth-child(odd) {
-        background-color: #6e6e6e;
+        background-color: #555;
     }
 
 </style>
