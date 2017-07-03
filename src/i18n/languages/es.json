@@ -25,6 +25,9 @@
     "Edit": "Editar",
     "First Name": "Nombre",
     "Game Groups": "Grupos de Juego",
+    "Games": "Juegos",
+    "Games Played": "Juegos Jugados",
+    "Games Won": "Juegos Ganados",
     "Group Details": "Detalles del Grupo",
     "Group Name": "Nombre del Grupo",
     "Home": "Inicio",
@@ -35,6 +38,8 @@
     "No Groups": "No hay Grupos",
     "No winners added yet": "No se han agregado ganadores aún",
     "Password": "Contraseña",
+    "Played": "Jugados",
+    "Player": "Jugador",
     "Players": "Jugadores",
     "Remaining Chips": "Fichas que sobran",
     "SELECT_LANG": "ENG",
@@ -45,5 +50,6 @@
     "Update Group": "Actualizar Grupo",
     "Update Game Group": "Actualizar Grupo de Juego",
     "You have not created any game group yet": "No has creado ningún grupo de juego aún",
-    "Winner(s)": "Ganador(es)"
+    "Winner(s)": "Ganador(es)",
+    "Won": "Ganados"
 }
