@@ -7,7 +7,8 @@ var path = require('path');
 
 app.use(compress());
 app.use(history({
-    index: path.join(__dirname, '/index.html')
+    index: path.join(__dirname, '/index.html'),
+    verbose: true
 }));
 app.use(favicon(path.join(__dirname, '/src/assets/favicon', 'favicon.ico')));
 app.use('/src/assets', express.static(path.join(__dirname, '/src/assets')));
