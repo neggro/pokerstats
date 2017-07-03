@@ -62,13 +62,13 @@
                     </p>
                 </div>
                 <div class="card-action" v-if="!game.isClosed">
-                    <router-link :to="{name: 'EditGame', params: {groupId: group.id, gameId: game.id}}" tag="a" class="waves-effect waves-light btn yellow darken-3">
+                    <router-link :to="{name: 'EditGame', params: {groupId: group.id, gameId: game.id}}" tag="a" class="btn btn-flat teal-text text-lighten-2">
                         {{ $t('Edit') }}
                     </router-link>
-                    <button type="button" class="waves-effect waves-light btn red darken-3" @click="confirmDeleteGame(game.id)">
+                    <button type="button" class="btn btn-flat teal-text text-lighten-2" @click="confirmDeleteGame(game.id)">
                         {{ $t('Delete') }}
                     </button>
-                    <button v-if="game.winners && game.winners.length" type="button" class="waves-effect waves-light btn green darken-3" @click="closeGame(game)">
+                    <button v-if="game.winners && game.winners.length" type="button" class="btn btn-flat teal-text text-lighten-2" @click="closeGame(game)">
                         {{ $t('Close Game') }}
                     </button>
                 </div>
@@ -84,9 +84,6 @@
             </div>
 
             <div class="col s12 action-controls">
-                <router-link :to="{name: 'CreateGame', params: {groupId: group.id}}" tag="button" class="waves-effect waves-light btn">
-                    {{ $t('Create New Game') }}
-                </router-link>
                 <button type="button" class="btn btn-flat" @click="goBack()">
                     {{ $t('Back') }}
                 </button>
@@ -106,6 +103,12 @@
                     {{ $t('The group was not found') }}
                 </span>
             </div>
+        </div>
+
+        <div class="fixed-action-btn">
+            <router-link :to="{name: 'CreateGame', params: {groupId: groupId}}" tag="button" class="btn-floating btn-large">
+                <i class="material-icons">add</i>
+            </router-link>
         </div>
 
         <app-modal id="message" :title="modalTitle" :message="modalMessage"
@@ -180,7 +183,7 @@
                     this.databaseRef.ref(`games/${this.groupId}`).orderByChild('sortStamp').on('child_added',
                         (snapshot) => {
                             let gameSnapshot = snapshot.val();
-                            //if there are more than one winner, let's sort the array from more to less chips
+                            // if there are more than one winner, let's sort the array from more to less chips
                             if (gameSnapshot.winners && gameSnapshot.winners.length > 1) {
                                 gameSnapshot.winners = gameSnapshot.winners.sort((a, b) => {
                                     if (a.chips > b.chips) {
