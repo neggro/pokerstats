@@ -82,7 +82,7 @@ const ROUTES = [
 ];
 
 export default new VueRouter({
-    mode: 'hash',
+    mode: 'history',
     scrollBehavior: () => ({
         y: 0
     }),
