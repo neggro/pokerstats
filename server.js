@@ -6,7 +6,9 @@ var favicon = require('serve-favicon');
 var path = require('path');
 
 app.use(compress());
-app.use(history());
+app.use(history({
+    index: path.join(__dirname, '/index.html')
+}));
 app.use(favicon(path.join(__dirname, '/src/assets/favicon', 'favicon.ico')));
 app.use('/src/assets', express.static(path.join(__dirname, '/src/assets')));
 app.use('/dist', express.static(path.join(__dirname, '/dist')));
