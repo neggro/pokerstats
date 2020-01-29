@@ -28,7 +28,7 @@
     "babel-loader": "^6.0.0",
     "babel-preset-env": "^1.5.1",
     "cross-env": "^7.0.0",
-    "css-loader": "^0.25.0",
+    "css-loader": "^0.28.11",
     "file-loader": "^2.0.0",
     "node-sass": "^4.5.0",
     "sass-loader": "^5.0.1",
